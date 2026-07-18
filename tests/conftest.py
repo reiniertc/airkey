@@ -17,7 +17,10 @@ API_BASE = "https://api.airkey.evva.com/cloud/v1"
 
 
 def register_empty_account(
-    aioclient_mock, base: str = API_BASE, locks: list[dict] | None = None
+    aioclient_mock,
+    base: str = API_BASE,
+    locks: list[dict] | None = None,
+    assigned_areas: dict[int, list[dict]] | None = None,
 ) -> None:
     """Register a full set of empty-but-valid responses for a coordinator refresh.
 
@@ -25,8 +28,11 @@ def register_empty_account(
     params passed at registration time as a required subset of the request's
     query string, so registering without params matches every page/filter
     variant the API client may request. Pass `locks` to seed a non-empty lock
-    list (e.g. to test per-lock usage-history fetches).
+    list (e.g. to test per-lock usage-history fetches), and `assigned_areas`
+    (lock_id -> list of AssignedArea dicts) to override the default empty
+    assigned-areas response for specific locks.
     """
+    assigned_areas = assigned_areas or {}
     aioclient_mock.get(
         f"{base}/customer",
         json={
@@ -47,6 +53,16 @@ def register_empty_account(
         f"{base}/locks",
         json={"offset": 0, "total": len(locks or []), "lockList": locks or []},
     )
+    for lock in locks or []:
+        aioclient_mock.get(
+            f"{base}/locks/{lock['id']}/settings/assigned-areas",
+            json=assigned_areas.get(lock["id"], []),
+        )
+        aioclient_mock.get(
+            f"{base}/lock-protocol-limit",
+            params={"lockId": str(lock["id"])},
+            json={"offset": 0, "total": 0, "lockProtocols": []},
+        )
     aioclient_mock.get(
         f"{base}/persons", json={"offset": 0, "total": 0, "personList": []}
     )

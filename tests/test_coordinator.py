@@ -12,8 +12,8 @@ from custom_components.airkey.coordinator import AirkeyDataUpdateCoordinator
 from .conftest import API_BASE, register_empty_account
 
 
-async def _make_coordinator(hass, aioclient_mock, locks=None):
-    register_empty_account(aioclient_mock, locks=locks)
+async def _make_coordinator(hass, aioclient_mock, locks=None, assigned_areas=None):
+    register_empty_account(aioclient_mock, locks=locks, assigned_areas=assigned_areas)
     entry = await _create_entry(hass)
     client = AirkeyApiClient(async_get_clientsession(hass), "key", ENV_PRODUCTION)
     return AirkeyDataUpdateCoordinator(hass, entry, client)
@@ -102,3 +102,27 @@ async def test_lock_last_used_from_protocol(hass, aioclient_mock) -> None:
     medium_usage = coordinator.data.medium_last_used[7]
     assert medium_usage["lock_id"] == 1
     assert medium_usage["lock_name"] == "Front door"
+
+
+async def test_area_locks_index_built_from_per_lock_assignments(
+    hass, aioclient_mock
+) -> None:
+    front_door = {"id": 1, "lockDoor": {"name": "Front door"}, "version": 1}
+    back_door = {"id": 2, "lockDoor": {"name": "Back door"}, "version": 1}
+    coordinator = await _make_coordinator(
+        hass,
+        aioclient_mock,
+        locks=[front_door, back_door],
+        assigned_areas={
+            1: [{"id": 100, "name": "Garden"}],
+            2: [{"id": 100, "name": "Garden"}, {"id": 200, "name": "House"}],
+        },
+    )
+
+    await coordinator.async_refresh()
+
+    assert coordinator.last_update_success
+    garden_locks = {lock["id"] for lock in coordinator.data.area_locks[100]}
+    assert garden_locks == {1, 2}
+    house_locks = {lock["id"] for lock in coordinator.data.area_locks[200]}
+    assert house_locks == {2}
