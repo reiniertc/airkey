@@ -57,6 +57,10 @@ ruff check custom_components tests
 ruff format --check custom_components tests
 ```
 
+## License
+
+[MIT](LICENSE)
+
 ## Disclaimer
 
 This is an unofficial, community-maintained integration and is not affiliated with or endorsed by EVVA. Use at your own risk.
