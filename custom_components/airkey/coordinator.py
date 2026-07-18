@@ -1,0 +1,131 @@
+"""DataUpdateCoordinator for the EVVA Airkey integration."""
+
+from __future__ import annotations
+
+import logging
+from dataclasses import dataclass, field
+from datetime import UTC, datetime, timedelta
+
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_SCAN_INTERVAL
+from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+
+from .api import AirkeyApiClient, AirkeyAuthError, AirkeyError, AirkeyRateLimitError
+from .const import (
+    CONF_EVENT_LOOKBACK_HOURS,
+    DEFAULT_EVENT_LOOKBACK_HOURS,
+    DEFAULT_SCAN_INTERVAL_MINUTES,
+    DOMAIN,
+    MIN_SCAN_INTERVAL_MINUTES,
+)
+
+_LOGGER = logging.getLogger(__name__)
+
+
+def _iso(dt: datetime) -> str:
+    return dt.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+@dataclass
+class AirkeyData:
+    """Snapshot of all Airkey resources fetched during one coordinator refresh."""
+
+    customer: dict = field(default_factory=dict)
+    settings: dict = field(default_factory=dict)
+    acos: list[dict] = field(default_factory=list)
+    areas: list[dict] = field(default_factory=list)
+    locks: list[dict] = field(default_factory=list)
+    persons: list[dict] = field(default_factory=list)
+    cards: list[dict] = field(default_factory=list)
+    phones: list[dict] = field(default_factory=list)
+    authorizations: list[dict] = field(default_factory=list)
+    blacklists: list[dict] = field(default_factory=list)
+    credits: dict = field(default_factory=dict)
+    maintenance_tasks: list[dict] = field(default_factory=list)
+    holiday_calendars: list[dict] = field(default_factory=list)
+    pending_phone_replacements: list[dict] = field(default_factory=list)
+    new_events: list[dict] = field(default_factory=list)
+    latest_event: dict | None = None
+
+
+class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
+    """Fetch all monitored Airkey resources on a single, shared interval."""
+
+    def __init__(
+        self, hass: HomeAssistant, entry: ConfigEntry, client: AirkeyApiClient
+    ) -> None:
+        self.entry = entry
+        self.client = client
+        self._last_event_poll: str | None = None
+
+        scan_minutes = max(
+            entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL_MINUTES),
+            MIN_SCAN_INTERVAL_MINUTES,
+        )
+        super().__init__(
+            hass,
+            _LOGGER,
+            name=DOMAIN,
+            update_interval=timedelta(minutes=scan_minutes),
+        )
+
+    async def _async_update_data(self) -> AirkeyData:
+        if self._last_event_poll:
+            created_after = self._last_event_poll
+        else:
+            lookback_hours = self.entry.options.get(
+                CONF_EVENT_LOOKBACK_HOURS, DEFAULT_EVENT_LOOKBACK_HOURS
+            )
+            created_after = _iso(datetime.now(UTC) - timedelta(hours=lookback_hours))
+
+        try:
+            customer = await self.client.get_customer()
+            settings = await self.client.get_settings()
+            acos = await self.client.get_acos()
+            areas = await self.client.get_areas()
+            locks = await self.client.get_locks()
+            persons = await self.client.get_persons()
+            cards = await self.client.get_cards()
+            phones = await self.client.get_phones()
+            authorizations = await self.client.get_authorizations()
+            blacklists = await self.client.get_blacklists()
+            credits_info = await self.client.get_credits()
+            maintenance_tasks = await self.client.get_maintenance_tasks()
+            holiday_calendars = await self.client.get_holiday_calendars()
+            pending_replacements = await self.client.get_pending_phone_replacements()
+            events = await self.client.get_events(created_after=created_after)
+        except AirkeyAuthError as err:
+            raise ConfigEntryAuthFailed("Airkey API key is invalid or expired") from err
+        except AirkeyRateLimitError as err:
+            raise UpdateFailed(
+                f"Rate limited by the Airkey API (retry after {err.retry_after}s)"
+            ) from err
+        except AirkeyError as err:
+            raise UpdateFailed(str(err)) from err
+
+        self._last_event_poll = _iso(datetime.now(UTC))
+
+        latest_event = self.data.latest_event if self.data else None
+        if events:
+            latest_event = max(events, key=lambda event: event.get("timestamp") or "")
+
+        return AirkeyData(
+            customer=customer or {},
+            settings=settings or {},
+            acos=acos,
+            areas=areas,
+            locks=locks,
+            persons=persons,
+            cards=cards,
+            phones=phones,
+            authorizations=authorizations,
+            blacklists=blacklists,
+            credits=credits_info or {},
+            maintenance_tasks=maintenance_tasks,
+            holiday_calendars=holiday_calendars,
+            pending_phone_replacements=pending_replacements,
+            new_events=events,
+            latest_event=latest_event,
+        )

@@ -1,3 +1,1040 @@
 refresh:
-  description: "Manually refresh all Airkey sensors"
-  fields: {}
+  name: Refresh data
+  description: Forces an immediate refresh of all Airkey data for this account.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+
+reset_test_data:
+  name: Reset test data
+  description: Resets the predefined test data of the free Airkey integration/test environment. Has no effect on production accounts.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+
+create_person:
+  name: Create person
+  description: Creates a new person in the access control system.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    first_name:
+      required: true
+      selector:
+        text:
+    last_name:
+      required: true
+      selector:
+        text:
+    correspondence_language_code:
+      required: true
+      example: en-UK
+      selector:
+        select:
+          options:
+            - de-DE
+            - en-UK
+            - nl-NL
+            - sv-SE
+            - fr-FR
+            - it-IT
+            - es-ES
+            - pt-PT
+            - cs-CZ
+            - sk-SK
+            - pl-PL
+    secondary_identification:
+      selector:
+        text:
+    gender:
+      selector:
+        select:
+          options:
+            - MALE
+            - FEMALE
+    birthday:
+      example: "1990-05-20"
+      selector:
+        text:
+    phone:
+      selector:
+        text:
+    email_address:
+      selector:
+        text:
+    street:
+      selector:
+        text:
+    postal_code:
+      selector:
+        text:
+    city:
+      selector:
+        text:
+    country_code:
+      example: NLD
+      selector:
+        text:
+    comment:
+      selector:
+        text:
+
+update_person:
+  name: Update person
+  description: Updates an existing person. Requires the person's current version number.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    person_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    version:
+      required: true
+      selector:
+        number:
+          min: 0
+          mode: box
+    first_name:
+      selector:
+        text:
+    last_name:
+      selector:
+        text:
+    correspondence_language_code:
+      selector:
+        select:
+          options:
+            - de-DE
+            - en-UK
+            - nl-NL
+            - sv-SE
+            - fr-FR
+            - it-IT
+            - es-ES
+            - pt-PT
+            - cs-CZ
+            - sk-SK
+            - pl-PL
+    secondary_identification:
+      selector:
+        text:
+    gender:
+      selector:
+        select:
+          options:
+            - MALE
+            - FEMALE
+    birthday:
+      selector:
+        text:
+    phone:
+      selector:
+        text:
+    email_address:
+      selector:
+        text:
+    street:
+      selector:
+        text:
+    postal_code:
+      selector:
+        text:
+    city:
+      selector:
+        text:
+    country_code:
+      selector:
+        text:
+    comment:
+      selector:
+        text:
+
+delete_person:
+  name: Delete person
+  description: Deletes a person from the access control system.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    person_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+
+create_simple_authorization:
+  name: Create simple authorization
+  description: Grants a medium access to a lock or area using a simple (permanent, periodical, one-day or fixed) authorization.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    medium_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    lock_id:
+      selector:
+        number:
+          min: 1
+          mode: box
+    area_id:
+      selector:
+        number:
+          min: 1
+          mode: box
+    remove_all_existing_authorizations_for_pair:
+      selector:
+        boolean:
+    push_message:
+      selector:
+        text:
+    authorization_info:
+      required: true
+      example: '{"type": "PERMANENT"}'
+      selector:
+        object:
+
+create_advanced_authorization:
+  name: Create or update advanced authorizations
+  description: Creates and/or updates multiple authorizations in a single call. Accepts the raw Airkey API request lists.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    authorization_create_list:
+      example: '[{"mediumId": 1, "lockId": 2, "authorizationInfoList": [{"type": "PERMANENT"}]}]'
+      selector:
+        object:
+    authorization_update_list:
+      example: '[{"id": 1, "medium": {"id": 1}, "version": 3, "authorizationInfoList": [{"type": "PERMANENT"}]}]'
+      selector:
+        object:
+    push_message:
+      selector:
+        text:
+
+delete_authorization:
+  name: Delete authorization
+  description: Requests deletion of an existing authorization.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    authorization_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    deletion_requested:
+      default: true
+      selector:
+        boolean:
+
+assign_medium:
+  name: Assign medium to person
+  description: Assigns a card or phone to a person.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    medium_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    person_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+
+cancel_medium_assignment:
+  name: Cancel medium assignment
+  description: Cancels the assignment of a medium to its person.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    medium_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+
+deactivate_medium:
+  name: Deactivate medium
+  description: Deactivates a card or phone, for example when it is lost.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    medium_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    reason:
+      required: true
+      selector:
+        text:
+    comment:
+      selector:
+        text:
+
+reactivate_medium:
+  name: Reactivate medium
+  description: Reactivates a previously deactivated medium.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    medium_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    reason:
+      required: true
+      selector:
+        text:
+    recover_authorizations:
+      default: false
+      selector:
+        boolean:
+    comment:
+      selector:
+        text:
+
+empty_medium:
+  name: Empty medium
+  description: Removes all authorizations from a medium without deleting it.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    medium_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+
+update_card:
+  name: Update card
+  description: Updates the properties of an existing card. Requires the card's current version number.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    medium_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    version:
+      required: true
+      selector:
+        number:
+          min: 0
+          mode: box
+    name:
+      selector:
+        text:
+    comment:
+      selector:
+        text:
+    release_duration_extended:
+      selector:
+        boolean:
+    permanent_opening_enabled:
+      selector:
+        boolean:
+
+add_phone:
+  name: Add phone
+  description: Registers a new phone as a medium.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    phone_number:
+      required: true
+      example: "+43123456789"
+      selector:
+        text:
+    name:
+      selector:
+        text:
+
+update_phone:
+  name: Update phone
+  description: Updates the properties of an existing phone. Requires the phone's current version number.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    medium_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    version:
+      required: true
+      selector:
+        number:
+          min: 0
+          mode: box
+    phone_number:
+      selector:
+        text:
+    name:
+      selector:
+        text:
+    comment:
+      selector:
+        text:
+    release_duration_extended:
+      selector:
+        boolean:
+    permanent_opening_enabled:
+      selector:
+        boolean:
+    in_maintenance_mode:
+      selector:
+        boolean:
+    medium_log_visible:
+      selector:
+        boolean:
+
+delete_phone:
+  name: Delete phone
+  description: Deletes a phone medium.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    medium_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+
+generate_phone_pairing_code:
+  name: Generate phone pairing code
+  description: Generates a new pairing code for a phone.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    medium_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+
+reset_phone_pin:
+  name: Reset phone PIN
+  description: Resets the PIN of a phone.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    medium_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+
+send_registration_code_mail:
+  name: Send registration code by e-mail
+  description: Sends the AirKey app registration code to the phone's owner by e-mail.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    medium_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    mail_subject:
+      selector:
+        text:
+    mail_text:
+      selector:
+        text:
+          multiline: true
+
+send_registration_code_sms:
+  name: Send registration code by SMS
+  description: Sends the AirKey app registration code to the phone by SMS.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    medium_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    sms_text:
+      selector:
+        text:
+
+send_a_key_mail:
+  name: Send a key by e-mail
+  description: Creates a person, phone and authorization (if needed) and e-mails a registration code in one call.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    phone_number:
+      required: true
+      selector:
+        text:
+    first_name:
+      required: true
+      selector:
+        text:
+    last_name:
+      required: true
+      selector:
+        text:
+    email_address:
+      required: true
+      selector:
+        text:
+    correspondence_language_code:
+      required: true
+      selector:
+        select:
+          options:
+            - de-DE
+            - en-UK
+            - nl-NL
+            - sv-SE
+            - fr-FR
+            - it-IT
+            - es-ES
+            - pt-PT
+            - cs-CZ
+            - sk-SK
+            - pl-PL
+    authorization:
+      example: '{"lockId": 1, "authorizationInfo": {"type": "PERMANENT"}}'
+      selector:
+        object:
+    mail_subject:
+      selector:
+        text:
+    mail_text:
+      selector:
+        text:
+          multiline: true
+
+send_a_key_sms:
+  name: Send a key by SMS
+  description: Creates a phone and authorization (if needed) and sends a registration code by SMS in one call.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    phone_number:
+      required: true
+      selector:
+        text:
+    person:
+      example: '{"firstName": "Jane", "lastName": "Doe", "correspondenceLanguageCode": "en-UK"}'
+      selector:
+        object:
+    authorization:
+      example: '{"lockId": 1, "authorizationInfo": {"type": "PERMANENT"}}'
+      selector:
+        object:
+    sms_text:
+      selector:
+        text:
+
+update_lock:
+  name: Update lock
+  description: Updates the properties of a lock. Requires the lock's current version number.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    lock_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    version:
+      required: true
+      selector:
+        number:
+          min: 0
+          mode: box
+    comment:
+      selector:
+        text:
+    door_name:
+      selector:
+        text:
+    additional_information:
+      selector:
+        text:
+    location:
+      selector:
+        text:
+    alternative_name:
+      selector:
+        text:
+
+remove_lock:
+  name: Remove lock
+  description: Marks a lock for removal. The lock needs to be synchronized to be actually removed.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    lock_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+
+abort_remove_lock:
+  name: Abort lock removal
+  description: Removes the pending removal mark from a lock.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    lock_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+
+update_lock_settings:
+  name: Update lock settings
+  description: Updates the settings of a lock, such as release durations and office mode. Requires the settings' current version number.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    lock_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    version:
+      required: true
+      selector:
+        number:
+          min: 0
+          mode: box
+    timezone:
+      example: Europe/Vienna
+      selector:
+        text:
+    holiday_calendar_enabled:
+      selector:
+        boolean:
+    manual_office_mode_enabled:
+      selector:
+        boolean:
+    automatic_office_mode_enabled:
+      selector:
+        boolean:
+    normal_release_duration:
+      selector:
+        number:
+          min: 1
+          mode: box
+    extended_release_duration:
+      selector:
+        number:
+          min: 1
+          mode: box
+    unlock_sync_mode:
+      selector:
+        select:
+          options:
+            - ALWAYS
+            - PERIODICALLY
+            - NEVER
+    rs485_log_output_enabled:
+      selector:
+        boolean:
+    allow_handsfree_mode:
+      selector:
+        boolean:
+    anonymize_data_in_owner_protocol:
+      selector:
+        boolean:
+
+assign_areas_to_lock:
+  name: Assign areas to lock
+  description: Assigns one or more areas to a lock.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    lock_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    area_ids:
+      required: true
+      selector:
+        object:
+
+unassign_areas_from_lock:
+  name: Unassign areas from lock
+  description: Removes the assignment of one or more areas from a lock.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    lock_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    area_ids:
+      required: true
+      selector:
+        object:
+
+create_sharing_code:
+  name: Create sharing code
+  description: Creates a code to share a lock with another access control system.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    lock_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+
+remove_sharing_code:
+  name: Remove sharing code
+  description: Removes a previously created sharing code from a lock.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    lock_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    sharing_code_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+
+remove_active_shares:
+  name: Remove active lock shares
+  description: Revokes access previously shared with other access control systems for a lock.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    lock_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    aco_ids:
+      required: true
+      selector:
+        object:
+
+add_shared_lock:
+  name: Add shared lock
+  description: Redeems a sharing code to add a lock shared by another access control system.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    sharing_code:
+      required: true
+      selector:
+        text:
+    anonymize_data_in_owner_protocol:
+      default: false
+      selector:
+        boolean:
+    alternative_door_name:
+      selector:
+        text:
+
+set_holiday_calendar_active:
+  name: Activate or deactivate holiday calendar
+  description: Activates or deactivates a holiday calendar. Requires the calendar's current version number.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    holiday_calendar_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    version:
+      required: true
+      selector:
+        number:
+          min: 0
+          mode: box
+    active:
+      required: true
+      selector:
+        boolean:
+
+add_holiday_calendar_slot:
+  name: Add holiday calendar slot
+  description: Adds a new slot (period) to a holiday calendar.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    holiday_calendar_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    slot_name:
+      required: true
+      selector:
+        text:
+    valid_from:
+      required: true
+      example: "2026-12-24T00:00:00.000Z"
+      selector:
+        text:
+    valid_to:
+      required: true
+      example: "2026-12-26T23:59:59.000Z"
+      selector:
+        text:
+    series:
+      example: '{"seriesType": "YEARLY"}'
+      selector:
+        object:
+
+update_holiday_calendar_slot:
+  name: Update holiday calendar slot
+  description: Updates an existing holiday calendar slot. Requires the slot's current version number.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    holiday_calendar_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    slot_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    version:
+      required: true
+      selector:
+        number:
+          min: 0
+          mode: box
+    slot_name:
+      required: true
+      selector:
+        text:
+    valid_from:
+      required: true
+      selector:
+        text:
+    valid_to:
+      required: true
+      selector:
+        text:
+    series:
+      selector:
+        object:
+    modify_future_slots:
+      default: false
+      selector:
+        boolean:
+
+delete_holiday_calendar_slot:
+  name: Delete holiday calendar slot
+  description: Deletes a slot from a holiday calendar.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    holiday_calendar_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    slot_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    delete_future_slots:
+      default: false
+      selector:
+        boolean:
+
+approve_phone_replacement:
+  name: Approve phone replacement
+  description: Approves a pending phone replacement request.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    replacement_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+
+reject_phone_replacement:
+  name: Reject phone replacement
+  description: Rejects a pending phone replacement request.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+    replacement_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
