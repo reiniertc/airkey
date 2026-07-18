@@ -11,7 +11,7 @@
       },
       "reauth_confirm": {
         "title": "EVVA Airkey opnieuw verifiëren",
-        "description": "De API-sleutel voor de omgeving '{environment}' is niet meer geldig. Voer een nieuwe in.",
+        "description": "De API-sleutel voor de omgeving {environment} is niet meer geldig. Voer een nieuwe in.",
         "data": {
           "api_key": "API-sleutel"
         }
@@ -137,7 +137,7 @@
   "issues": {
     "write_access_denied": {
       "title": "Airkey API-sleutel heeft geen schrijftoegang",
-      "description": "De Airkey API-sleutel voor '{title}' heeft een schrijfverzoek geweigerd (HTTP 403). Gratis/alleen-lezen Airkey-contracten kunnen alleen worden gebruikt om te monitoren; het aanmaken, bijwerken of verwijderen van data vereist een productie-API-sleutel met schrijftoegang. Upgrade je Airkey Cloud Interface-licentie of gebruik een sleutel die schrijfrechten heeft gekregen."
+      "description": "De Airkey API-sleutel voor {title} heeft een schrijfverzoek geweigerd (HTTP 403). Gratis/alleen-lezen Airkey-contracten kunnen alleen worden gebruikt om te monitoren; het aanmaken, bijwerken of verwijderen van data vereist een productie-API-sleutel met schrijftoegang. Upgrade je Airkey Cloud Interface-licentie of gebruik een sleutel die schrijfrechten heeft gekregen."
     }
   },
   "services": {

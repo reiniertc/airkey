@@ -137,7 +137,7 @@
   "issues": {
     "write_access_denied": {
       "title": "Airkey API key has no write access",
-      "description": "The Airkey API key for '{title}' rejected a write request (HTTP 403). Free/read-only Airkey contracts can only be used for monitoring; creating, updating or deleting data requires a production API key with write access. Upgrade your Airkey Cloud Interface license or use a key that has been granted write permissions."
+      "description": "The Airkey API key for {title} rejected a write request (HTTP 403). Free/read-only Airkey contracts can only be used for monitoring; creating, updating or deleting data requires a production API key with write access. Upgrade your Airkey Cloud Interface license or use a key that has been granted write permissions."
     }
   },
   "services": {
