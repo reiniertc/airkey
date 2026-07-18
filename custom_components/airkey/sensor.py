@@ -29,6 +29,10 @@ def _person_name(person: dict) -> str:
     return f"{person.get('firstName', '')} {person.get('lastName', '')}".strip()
 
 
+def _person_names_by_id(persons: list[dict]) -> dict[int, str]:
+    return {p.get("id"): _person_name(p) for p in persons}
+
+
 @dataclass(frozen=True, kw_only=True)
 class AirkeySensorEntityDescription(SensorEntityDescription):
     """Describes an Airkey hub-level sensor."""
@@ -76,6 +80,16 @@ SENSOR_DESCRIPTIONS: tuple[AirkeySensorEntityDescription, ...] = (
                     "id": c.get("id"),
                     "name": c.get("name"),
                     "identifier": c.get("mediumIdentifier"),
+                    "person_id": c.get("personId"),
+                    "person_name": _person_names_by_id(d.persons).get(
+                        c.get("personId")
+                    ),
+                    "last_used_at": d.medium_last_used.get(c.get("id"), {}).get(
+                        "timestamp"
+                    ),
+                    "last_used_lock_name": d.medium_last_used.get(c.get("id"), {}).get(
+                        "lock_name"
+                    ),
                 }
                 for c in d.cards
             ]
@@ -92,6 +106,16 @@ SENSOR_DESCRIPTIONS: tuple[AirkeySensorEntityDescription, ...] = (
                     "id": p.get("id"),
                     "name": p.get("name"),
                     "identifier": p.get("mediumIdentifier"),
+                    "person_id": p.get("personId"),
+                    "person_name": _person_names_by_id(d.persons).get(
+                        p.get("personId")
+                    ),
+                    "last_used_at": d.medium_last_used.get(p.get("id"), {}).get(
+                        "timestamp"
+                    ),
+                    "last_used_lock_name": d.medium_last_used.get(p.get("id"), {}).get(
+                        "lock_name"
+                    ),
                 }
                 for p in d.phones
             ]
@@ -258,6 +282,7 @@ class AirkeyLockSensor(AirkeyLockEntity, SensorEntity):
         lock = self._get_lock() or {}
         door = lock.get("lockDoor") or {}
         firmware = lock.get("lockFirmware") or {}
+        last_used = self.coordinator.data.lock_last_used.get(self._lock_id, {})
         return {
             "lock_type": lock.get("lockType"),
             "lock_technology": lock.get("lockTechnology"),
@@ -271,4 +296,7 @@ class AirkeyLockSensor(AirkeyLockEntity, SensorEntity):
             "applet_version": firmware.get("appletVersion"),
             "pic_version": firmware.get("picVersion"),
             "motor_pic_version": firmware.get("motorPicVersion"),
+            "last_used_at": last_used.get("timestamp"),
+            "last_used_by_medium_id": last_used.get("medium_id"),
+            "last_used_by_medium_name": last_used.get("medium_name"),
         }

@@ -31,10 +31,10 @@ async def test_setup_and_unload_entry(hass, aioclient_mock) -> None:
     await hass.async_block_till_done()
 
     assert entry.state is ConfigEntryState.LOADED
-    assert hass.states.get("sensor.test_account_credits").state == "100"
-    assert hass.states.get("sensor.test_account_persons").state == "0"
-    assert hass.states.get("button.test_account_refresh_data") is not None
-    assert hass.states.get("event.test_account_access_events") is not None
+    assert hass.states.get("sensor.airkey_credits").state == "100"
+    assert hass.states.get("sensor.airkey_persons").state == "0"
+    assert hass.states.get("button.airkey_refresh_data") is not None
+    assert hass.states.get("event.airkey_access_events") is not None
     assert hass.services.has_service(DOMAIN, "refresh")
 
     assert await hass.config_entries.async_unload(entry.entry_id)

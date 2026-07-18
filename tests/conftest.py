@@ -16,13 +16,16 @@ def auto_enable_custom_integrations(enable_custom_integrations):
 API_BASE = "https://api.airkey.evva.com/cloud/v1"
 
 
-def register_empty_account(aioclient_mock, base: str = API_BASE) -> None:
+def register_empty_account(
+    aioclient_mock, base: str = API_BASE, locks: list[dict] | None = None
+) -> None:
     """Register a full set of empty-but-valid responses for a coordinator refresh.
 
     aioclient_mock matches a registered URL against the *path* and treats any
     params passed at registration time as a required subset of the request's
     query string, so registering without params matches every page/filter
-    variant the API client may request.
+    variant the API client may request. Pass `locks` to seed a non-empty lock
+    list (e.g. to test per-lock usage-history fetches).
     """
     aioclient_mock.get(
         f"{base}/customer",
@@ -40,7 +43,10 @@ def register_empty_account(aioclient_mock, base: str = API_BASE) -> None:
     )
     aioclient_mock.get(f"{base}/acos", json={"acoList": []})
     aioclient_mock.get(f"{base}/areas", json={"offset": 0, "total": 0, "areaList": []})
-    aioclient_mock.get(f"{base}/locks", json={"offset": 0, "total": 0, "lockList": []})
+    aioclient_mock.get(
+        f"{base}/locks",
+        json={"offset": 0, "total": len(locks or []), "lockList": locks or []},
+    )
     aioclient_mock.get(
         f"{base}/persons", json={"offset": 0, "total": 0, "personList": []}
     )

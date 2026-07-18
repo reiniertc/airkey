@@ -9,11 +9,11 @@ from custom_components.airkey.api import AirkeyApiClient
 from custom_components.airkey.const import CONF_ENVIRONMENT, DOMAIN, ENV_PRODUCTION
 from custom_components.airkey.coordinator import AirkeyDataUpdateCoordinator
 
-from .conftest import register_empty_account
+from .conftest import API_BASE, register_empty_account
 
 
-async def _make_coordinator(hass, aioclient_mock):
-    register_empty_account(aioclient_mock)
+async def _make_coordinator(hass, aioclient_mock, locks=None):
+    register_empty_account(aioclient_mock, locks=locks)
     entry = await _create_entry(hass)
     client = AirkeyApiClient(async_get_clientsession(hass), "key", ENV_PRODUCTION)
     return AirkeyDataUpdateCoordinator(hass, entry, client)
@@ -59,3 +59,46 @@ async def test_second_refresh_uses_last_poll_as_created_after(
     assert len(events_calls) == 2
     assert events_calls[0][1].query.get("createdAfter") != first_poll
     assert events_calls[1][1].query.get("createdAfter") == first_poll
+
+
+async def test_lock_last_used_from_protocol(hass, aioclient_mock) -> None:
+    lock = {"id": 1, "lockDoor": {"name": "Front door"}, "version": 1}
+    aioclient_mock.get(
+        f"{API_BASE}/lock-protocol-limit",
+        params={"lockId": "1"},
+        json={
+            "offset": 0,
+            "total": 2,
+            "lockProtocols": [
+                {
+                    "event": {"type": "UNLOCKING_SUCCESSFUL"},
+                    "medium": {"id": 42, "name": "Jane's card"},
+                    "timestamp": "2026-07-01T10:00:00.000Z",
+                },
+                {
+                    "event": {"type": "CYLINDER_SYNCHRONIZATION_VIA_OTA"},
+                    "medium": {"id": 99, "name": "Sync medium"},
+                    "timestamp": "2026-07-10T10:00:00.000Z",
+                },
+                {
+                    "event": {"type": "UNLOCKING_SUCCESSFUL"},
+                    "medium": {"id": 7, "name": "John's phone"},
+                    "timestamp": "2026-07-05T08:30:00.000Z",
+                },
+            ],
+        },
+    )
+    coordinator = await _make_coordinator(hass, aioclient_mock, locks=[lock])
+
+    await coordinator.async_refresh()
+
+    assert coordinator.last_update_success
+    # Most recent *successful unlock* wins - the later sync event is ignored.
+    usage = coordinator.data.lock_last_used[1]
+    assert usage["timestamp"] == "2026-07-05T08:30:00.000Z"
+    assert usage["medium_id"] == 7
+    assert usage["medium_name"] == "John's phone"
+
+    medium_usage = coordinator.data.medium_last_used[7]
+    assert medium_usage["lock_id"] == 1
+    assert medium_usage["lock_name"] == "Front door"

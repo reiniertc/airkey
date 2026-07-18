@@ -8,9 +8,9 @@ Custom Home Assistant integration for the [EVVA AirKey Cloud API](https://integr
 
 **Monitoring** (one shared [DataUpdateCoordinator](https://developers.home-assistant.io/docs/integration_fetching_data/), polled on a configurable interval):
 
-- A hub device with sensors for credits, persons, cards, phones, areas, authorizations, blacklist entries, maintenance tasks, holiday calendars, pending phone replacements, access control operators, and the last event — each sensor's full record list is available in its attributes.
+- A hub device with sensors for credits, persons, cards, phones, areas, authorizations, blacklist entries, maintenance tasks, holiday calendars, pending phone replacements, access control operators, and the last event — each sensor's full record list is available in its attributes. Cards and phones include which person they're assigned to (`person_id`/`person_name`) and when/where they were last used (`last_used_at`/`last_used_lock_name`).
 - Diagnostic binary sensors for two-factor authentication / four-eyes settings, maintenance-required and pending-phone-replacement alerts.
-- A device per lock, with a sensor exposing door name, type, technology, firmware versions and a "removal requested" binary sensor.
+- A device per lock, with a sensor exposing door name, type, technology, firmware versions, a "removal requested" binary sensor, and who last unlocked it and when (`last_used_at`/`last_used_by_medium_name`, looked up from the lock's protocol history for the last 30 days).
 - An `event.*` entity streaming the live audit trail (unlocking, app pairing, authorization synchronization) so you can build automations on real access events.
 - A "Refresh data" button, and (only for the free test/integration environment) a "Reset test data" button.
 
@@ -56,6 +56,10 @@ pytest tests/ -q
 ruff check custom_components tests
 ruff format --check custom_components tests
 ```
+
+## License
+
+[MIT](LICENSE)
 
 ## Disclaimer
 

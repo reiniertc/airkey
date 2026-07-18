@@ -1,14 +1,13 @@
 {
   "domain": "airkey",
   "name": "EVVA Airkey",
-  "version": "2.0.0",
-  "documentation": "https://github.com/reiniertc/airkey",
-  "issue_tracker": "https://github.com/reiniertc/airkey/issues",
-  "requirements": [],
-  "dependencies": [],
   "codeowners": ["@reiniertc"],
   "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/reiniertc/airkey",
   "integration_type": "hub",
   "iot_class": "cloud_polling",
-  "homeassistant": "2024.12.0"
+  "issue_tracker": "https://github.com/reiniertc/airkey/issues",
+  "requirements": [],
+  "version": "2.1.0"
 }

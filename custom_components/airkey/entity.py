@@ -22,10 +22,12 @@ class AirkeyEntity(CoordinatorEntity[AirkeyDataUpdateCoordinator]):
 
     @property
     def device_info(self) -> DeviceInfo:
-        customer = self.coordinator.data.customer if self.coordinator.data else {}
+        # Fixed device name (rather than the account's own accessControlSystemName) so
+        # generated entity_ids are stable, e.g. sensor.airkey_persons. The account name
+        # itself is still available on the "account" sensor's attributes.
         return DeviceInfo(
             identifiers={(DOMAIN, self.coordinator.entry.entry_id)},
-            name=customer.get("accessControlSystemName") or "EVVA Airkey",
+            name="Airkey",
             manufacturer=MANUFACTURER,
             model="Airkey Cloud API",
             configuration_url="https://airkey.evva.com",
@@ -62,14 +64,14 @@ class AirkeyLockEntity(CoordinatorEntity[AirkeyDataUpdateCoordinator]):
     def device_info(self) -> DeviceInfo:
         lock = self._get_lock() or {}
         door = lock.get("lockDoor") or {}
-        name = (
+        door_name = (
             door.get("name") or door.get("alternativeName") or f"Lock {self._lock_id}"
         )
         return DeviceInfo(
             identifiers={
                 (DOMAIN, f"{self.coordinator.entry.entry_id}_lock_{self._lock_id}")
             },
-            name=name,
+            name=f"Airkey {door_name}",
             manufacturer=MANUFACTURER,
             model=lock.get("lockTechnology") or "Airkey lock",
             via_device=(DOMAIN, self.coordinator.entry.entry_id),
