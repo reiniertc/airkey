@@ -48,32 +48,76 @@
   },
   "entity": {
     "sensor": {
-      "credits": { "name": "Credits" },
-      "persons": { "name": "Persons" },
-      "cards": { "name": "Cards" },
-      "phones": { "name": "Phones" },
-      "locks": { "name": "Locks" },
-      "areas": { "name": "Areas" },
-      "authorizations": { "name": "Authorizations" },
-      "blacklist_entries": { "name": "Blacklist entries" },
-      "maintenance_tasks": { "name": "Maintenance tasks" },
-      "holiday_calendars": { "name": "Holiday calendars" },
-      "pending_phone_replacements": { "name": "Pending phone replacements" },
-      "operators": { "name": "Access control operators" },
-      "last_event": { "name": "Last event" },
-      "account": { "name": "Account" },
-      "lock": { "name": "Lock" }
+      "credits": {
+        "name": "Credits"
+      },
+      "persons": {
+        "name": "Persons"
+      },
+      "cards": {
+        "name": "Cards"
+      },
+      "phones": {
+        "name": "Phones"
+      },
+      "locks": {
+        "name": "Locks"
+      },
+      "areas": {
+        "name": "Areas"
+      },
+      "authorizations": {
+        "name": "Authorizations"
+      },
+      "blacklist_entries": {
+        "name": "Blacklist entries"
+      },
+      "maintenance_tasks": {
+        "name": "Maintenance tasks"
+      },
+      "holiday_calendars": {
+        "name": "Holiday calendars"
+      },
+      "pending_phone_replacements": {
+        "name": "Pending phone replacements"
+      },
+      "operators": {
+        "name": "Access control operators"
+      },
+      "last_event": {
+        "name": "Last event"
+      },
+      "account": {
+        "name": "Account"
+      },
+      "lock": {
+        "name": "Lock"
+      }
     },
     "binary_sensor": {
-      "maintenance_required": { "name": "Maintenance required" },
-      "pending_phone_replacements": { "name": "Pending phone replacements" },
-      "two_factor_active": { "name": "Two-factor authentication active" },
-      "four_eyes_enabled": { "name": "Four-eyes principle enabled" },
-      "removal_requested": { "name": "Removal requested" }
+      "maintenance_required": {
+        "name": "Maintenance required"
+      },
+      "pending_phone_replacements": {
+        "name": "Pending phone replacements"
+      },
+      "two_factor_active": {
+        "name": "Two-factor authentication active"
+      },
+      "four_eyes_enabled": {
+        "name": "Four-eyes principle enabled"
+      },
+      "removal_requested": {
+        "name": "Removal requested"
+      }
     },
     "button": {
-      "refresh": { "name": "Refresh data" },
-      "reset_test_data": { "name": "Reset test data" }
+      "refresh": {
+        "name": "Refresh data"
+      },
+      "reset_test_data": {
+        "name": "Reset test data"
+      }
     },
     "event": {
       "access_events": {
@@ -101,402 +145,906 @@
       "name": "Refresh data",
       "description": "Forces an immediate refresh of all Airkey data for this account.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to refresh." }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to refresh."
+        }
       }
     },
     "reset_test_data": {
       "name": "Reset test data",
       "description": "Resets the predefined test data of the free Airkey integration/test environment. Has no effect on production accounts.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey test account." }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey test account."
+        }
       }
     },
     "create_person": {
       "name": "Create person",
       "description": "Creates a new person in the access control system.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "first_name": { "name": "First name", "description": "First name of the person." },
-        "last_name": { "name": "Last name", "description": "Last name of the person." },
-        "correspondence_language_code": { "name": "Correspondence language", "description": "Language used for e-mails/SMS sent to this person." },
-        "secondary_identification": { "name": "Secondary identification", "description": "For example an employee or badge number." },
-        "gender": { "name": "Gender", "description": "" },
-        "birthday": { "name": "Birthday", "description": "Format yyyy-mm-dd." },
-        "phone": { "name": "Phone number", "description": "" },
-        "email_address": { "name": "E-mail address", "description": "" },
-        "street": { "name": "Street", "description": "" },
-        "postal_code": { "name": "Postal code", "description": "" },
-        "city": { "name": "City", "description": "" },
-        "country_code": { "name": "Country code", "description": "ISO 3166-1 alpha-3, e.g. NLD." },
-        "comment": { "name": "Comment", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "first_name": {
+          "name": "First name",
+          "description": "First name of the person."
+        },
+        "last_name": {
+          "name": "Last name",
+          "description": "Last name of the person."
+        },
+        "correspondence_language_code": {
+          "name": "Correspondence language",
+          "description": "Language used for e-mails/SMS sent to this person."
+        },
+        "secondary_identification": {
+          "name": "Secondary identification",
+          "description": "For example an employee or badge number."
+        },
+        "gender": {
+          "name": "Gender",
+          "description": ""
+        },
+        "birthday": {
+          "name": "Birthday",
+          "description": "Format yyyy-mm-dd."
+        },
+        "phone": {
+          "name": "Phone number",
+          "description": ""
+        },
+        "email_address": {
+          "name": "E-mail address",
+          "description": ""
+        },
+        "street": {
+          "name": "Street",
+          "description": ""
+        },
+        "postal_code": {
+          "name": "Postal code",
+          "description": ""
+        },
+        "city": {
+          "name": "City",
+          "description": ""
+        },
+        "country_code": {
+          "name": "Country code",
+          "description": "ISO 3166-1 alpha-3, e.g. NLD."
+        },
+        "comment": {
+          "name": "Comment",
+          "description": ""
+        }
       }
     },
     "update_person": {
       "name": "Update person",
       "description": "Updates an existing person. Requires the person's current version number.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "person_id": { "name": "Person ID", "description": "" },
-        "version": { "name": "Version", "description": "Current version number, see the persons sensor attributes." }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "person_id": {
+          "name": "Person ID",
+          "description": ""
+        },
+        "version": {
+          "name": "Version",
+          "description": "Current version number, see the persons sensor attributes."
+        }
       }
     },
     "delete_person": {
       "name": "Delete person",
       "description": "Deletes a person from the access control system.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "person_id": { "name": "Person ID", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "person_id": {
+          "name": "Person ID",
+          "description": ""
+        }
       }
     },
     "create_simple_authorization": {
       "name": "Create simple authorization",
       "description": "Grants a medium access to a lock or area using a simple (permanent, periodical, one-day or fixed) authorization.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "medium_id": { "name": "Medium ID", "description": "" },
-        "lock_id": { "name": "Lock ID", "description": "Set either a lock or an area." },
-        "area_id": { "name": "Area ID", "description": "Set either a lock or an area." },
-        "remove_all_existing_authorizations_for_pair": { "name": "Remove existing authorizations", "description": "Removes all other authorizations for this medium/lock or medium/area pair first." },
-        "push_message": { "name": "Push message", "description": "Optional push notification text for the app." },
-        "authorization_info": { "name": "Authorization info", "description": "The authorization definition, e.g. {\"type\": \"PERMANENT\"}. See the Airkey API reference for PERMANENT/PERIODICAL/ONE_DAY/SIMPLE fields." }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "medium_id": {
+          "name": "Medium ID",
+          "description": ""
+        },
+        "lock_id": {
+          "name": "Lock ID",
+          "description": "Set either a lock or an area."
+        },
+        "area_id": {
+          "name": "Area ID",
+          "description": "Set either a lock or an area."
+        },
+        "remove_all_existing_authorizations_for_pair": {
+          "name": "Remove existing authorizations",
+          "description": "Removes all other authorizations for this medium/lock or medium/area pair first."
+        },
+        "push_message": {
+          "name": "Push message",
+          "description": "Optional push notification text for the app."
+        },
+        "authorization_info": {
+          "name": "Authorization info",
+          "description": "The authorization definition, e.g. type: PERMANENT. See the Airkey API reference for the PERMANENT/PERIODICAL/ONE_DAY/SIMPLE field layouts, or this field's example."
+        }
       }
     },
     "create_advanced_authorization": {
       "name": "Create or update advanced authorizations",
       "description": "Creates and/or updates multiple authorizations in a single call. Accepts the raw Airkey API request lists.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "authorization_create_list": { "name": "Authorizations to create", "description": "List following the Airkey AuthorizationCreate schema." },
-        "authorization_update_list": { "name": "Authorizations to update", "description": "List following the Airkey Authorization schema." },
-        "push_message": { "name": "Push message", "description": "Optional push notification text for the app." }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "authorization_create_list": {
+          "name": "Authorizations to create",
+          "description": "List following the Airkey AuthorizationCreate schema."
+        },
+        "authorization_update_list": {
+          "name": "Authorizations to update",
+          "description": "List following the Airkey Authorization schema."
+        },
+        "push_message": {
+          "name": "Push message",
+          "description": "Optional push notification text for the app."
+        }
       }
     },
     "delete_authorization": {
       "name": "Delete authorization",
       "description": "Requests deletion of an existing authorization.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "authorization_id": { "name": "Authorization ID", "description": "" },
-        "deletion_requested": { "name": "Deletion requested", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "authorization_id": {
+          "name": "Authorization ID",
+          "description": ""
+        },
+        "deletion_requested": {
+          "name": "Deletion requested",
+          "description": ""
+        }
       }
     },
     "assign_medium": {
       "name": "Assign medium to person",
       "description": "Assigns a card or phone to a person.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "medium_id": { "name": "Medium ID", "description": "" },
-        "person_id": { "name": "Person ID", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "medium_id": {
+          "name": "Medium ID",
+          "description": ""
+        },
+        "person_id": {
+          "name": "Person ID",
+          "description": ""
+        }
       }
     },
     "cancel_medium_assignment": {
       "name": "Cancel medium assignment",
       "description": "Cancels the assignment of a medium to its person.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "medium_id": { "name": "Medium ID", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "medium_id": {
+          "name": "Medium ID",
+          "description": ""
+        }
       }
     },
     "deactivate_medium": {
       "name": "Deactivate medium",
       "description": "Deactivates a card or phone, for example when it is lost.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "medium_id": { "name": "Medium ID", "description": "" },
-        "reason": { "name": "Reason", "description": "Free-text reason, stored in the medium protocol." },
-        "comment": { "name": "Comment", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "medium_id": {
+          "name": "Medium ID",
+          "description": ""
+        },
+        "reason": {
+          "name": "Reason",
+          "description": "Free-text reason, stored in the medium protocol."
+        },
+        "comment": {
+          "name": "Comment",
+          "description": ""
+        }
       }
     },
     "reactivate_medium": {
       "name": "Reactivate medium",
       "description": "Reactivates a previously deactivated medium.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "medium_id": { "name": "Medium ID", "description": "" },
-        "reason": { "name": "Reason", "description": "" },
-        "recover_authorizations": { "name": "Recover authorizations", "description": "Restore the authorizations the medium had before deactivation." },
-        "comment": { "name": "Comment", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "medium_id": {
+          "name": "Medium ID",
+          "description": ""
+        },
+        "reason": {
+          "name": "Reason",
+          "description": ""
+        },
+        "recover_authorizations": {
+          "name": "Recover authorizations",
+          "description": "Restore the authorizations the medium had before deactivation."
+        },
+        "comment": {
+          "name": "Comment",
+          "description": ""
+        }
       }
     },
     "empty_medium": {
       "name": "Empty medium",
       "description": "Removes all authorizations from a medium without deleting it.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "medium_id": { "name": "Medium ID", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "medium_id": {
+          "name": "Medium ID",
+          "description": ""
+        }
       }
     },
     "update_card": {
       "name": "Update card",
       "description": "Updates the properties of an existing card. Requires the card's current version number.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "medium_id": { "name": "Medium ID", "description": "" },
-        "version": { "name": "Version", "description": "" },
-        "name": { "name": "Name", "description": "" },
-        "comment": { "name": "Comment", "description": "" },
-        "release_duration_extended": { "name": "Extended release duration", "description": "" },
-        "permanent_opening_enabled": { "name": "Permanent opening enabled", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "medium_id": {
+          "name": "Medium ID",
+          "description": ""
+        },
+        "version": {
+          "name": "Version",
+          "description": ""
+        },
+        "name": {
+          "name": "Name",
+          "description": ""
+        },
+        "comment": {
+          "name": "Comment",
+          "description": ""
+        },
+        "release_duration_extended": {
+          "name": "Extended release duration",
+          "description": ""
+        },
+        "permanent_opening_enabled": {
+          "name": "Permanent opening enabled",
+          "description": ""
+        }
       }
     },
     "add_phone": {
       "name": "Add phone",
       "description": "Registers a new phone as a medium.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "phone_number": { "name": "Phone number", "description": "International format, e.g. +43123456789." },
-        "name": { "name": "Name", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "phone_number": {
+          "name": "Phone number",
+          "description": "International format, e.g. +43123456789."
+        },
+        "name": {
+          "name": "Name",
+          "description": ""
+        }
       }
     },
     "update_phone": {
       "name": "Update phone",
       "description": "Updates the properties of an existing phone. Requires the phone's current version number.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "medium_id": { "name": "Medium ID", "description": "" },
-        "version": { "name": "Version", "description": "" },
-        "phone_number": { "name": "Phone number", "description": "" },
-        "name": { "name": "Name", "description": "" },
-        "comment": { "name": "Comment", "description": "" },
-        "release_duration_extended": { "name": "Extended release duration", "description": "" },
-        "permanent_opening_enabled": { "name": "Permanent opening enabled", "description": "" },
-        "in_maintenance_mode": { "name": "In maintenance mode", "description": "" },
-        "medium_log_visible": { "name": "Medium log visible", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "medium_id": {
+          "name": "Medium ID",
+          "description": ""
+        },
+        "version": {
+          "name": "Version",
+          "description": ""
+        },
+        "phone_number": {
+          "name": "Phone number",
+          "description": ""
+        },
+        "name": {
+          "name": "Name",
+          "description": ""
+        },
+        "comment": {
+          "name": "Comment",
+          "description": ""
+        },
+        "release_duration_extended": {
+          "name": "Extended release duration",
+          "description": ""
+        },
+        "permanent_opening_enabled": {
+          "name": "Permanent opening enabled",
+          "description": ""
+        },
+        "in_maintenance_mode": {
+          "name": "In maintenance mode",
+          "description": ""
+        },
+        "medium_log_visible": {
+          "name": "Medium log visible",
+          "description": ""
+        }
       }
     },
     "delete_phone": {
       "name": "Delete phone",
       "description": "Deletes a phone medium.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "medium_id": { "name": "Medium ID", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "medium_id": {
+          "name": "Medium ID",
+          "description": ""
+        }
       }
     },
     "generate_phone_pairing_code": {
       "name": "Generate phone pairing code",
       "description": "Generates a new pairing code for a phone.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "medium_id": { "name": "Medium ID", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "medium_id": {
+          "name": "Medium ID",
+          "description": ""
+        }
       }
     },
     "reset_phone_pin": {
       "name": "Reset phone PIN",
       "description": "Resets the PIN of a phone.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "medium_id": { "name": "Medium ID", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "medium_id": {
+          "name": "Medium ID",
+          "description": ""
+        }
       }
     },
     "send_registration_code_mail": {
       "name": "Send registration code by e-mail",
       "description": "Sends the AirKey app registration code to the phone's owner by e-mail.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "medium_id": { "name": "Medium ID", "description": "" },
-        "mail_subject": { "name": "E-mail subject", "description": "Leave empty to use the account default." },
-        "mail_text": { "name": "E-mail text", "description": "Leave empty to use the account default." }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "medium_id": {
+          "name": "Medium ID",
+          "description": ""
+        },
+        "mail_subject": {
+          "name": "E-mail subject",
+          "description": "Leave empty to use the account default."
+        },
+        "mail_text": {
+          "name": "E-mail text",
+          "description": "Leave empty to use the account default."
+        }
       }
     },
     "send_registration_code_sms": {
       "name": "Send registration code by SMS",
       "description": "Sends the AirKey app registration code to the phone by SMS.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "medium_id": { "name": "Medium ID", "description": "" },
-        "sms_text": { "name": "SMS text", "description": "Leave empty to use the account default." }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "medium_id": {
+          "name": "Medium ID",
+          "description": ""
+        },
+        "sms_text": {
+          "name": "SMS text",
+          "description": "Leave empty to use the account default."
+        }
       }
     },
     "send_a_key_mail": {
       "name": "Send a key by e-mail",
       "description": "Creates a person, phone and authorization (if needed) and e-mails a registration code in one call.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "phone_number": { "name": "Phone number", "description": "" },
-        "first_name": { "name": "First name", "description": "" },
-        "last_name": { "name": "Last name", "description": "" },
-        "email_address": { "name": "E-mail address", "description": "" },
-        "correspondence_language_code": { "name": "Correspondence language", "description": "" },
-        "authorization": { "name": "Authorization", "description": "Optional FixedMediumSimpleAuthorizationCreate object, e.g. {\"lockId\": 1, \"authorizationInfo\": {\"type\": \"PERMANENT\"}}." },
-        "mail_subject": { "name": "E-mail subject", "description": "" },
-        "mail_text": { "name": "E-mail text", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "phone_number": {
+          "name": "Phone number",
+          "description": ""
+        },
+        "first_name": {
+          "name": "First name",
+          "description": ""
+        },
+        "last_name": {
+          "name": "Last name",
+          "description": ""
+        },
+        "email_address": {
+          "name": "E-mail address",
+          "description": ""
+        },
+        "correspondence_language_code": {
+          "name": "Correspondence language",
+          "description": ""
+        },
+        "authorization": {
+          "name": "Authorization",
+          "description": "Optional FixedMediumSimpleAuthorizationCreate object, see this field's example."
+        },
+        "mail_subject": {
+          "name": "E-mail subject",
+          "description": ""
+        },
+        "mail_text": {
+          "name": "E-mail text",
+          "description": ""
+        }
       }
     },
     "send_a_key_sms": {
       "name": "Send a key by SMS",
       "description": "Creates a phone and authorization (if needed) and sends a registration code by SMS in one call.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "phone_number": { "name": "Phone number", "description": "" },
-        "person": { "name": "Person", "description": "Optional PersonCreate object for a new person." },
-        "authorization": { "name": "Authorization", "description": "Optional FixedMediumSimpleAuthorizationCreate object." },
-        "sms_text": { "name": "SMS text", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "phone_number": {
+          "name": "Phone number",
+          "description": ""
+        },
+        "person": {
+          "name": "Person",
+          "description": "Optional PersonCreate object for a new person."
+        },
+        "authorization": {
+          "name": "Authorization",
+          "description": "Optional FixedMediumSimpleAuthorizationCreate object."
+        },
+        "sms_text": {
+          "name": "SMS text",
+          "description": ""
+        }
       }
     },
     "update_lock": {
       "name": "Update lock",
       "description": "Updates the properties of a lock. Requires the lock's current version number.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "lock_id": { "name": "Lock ID", "description": "" },
-        "version": { "name": "Version", "description": "" },
-        "comment": { "name": "Comment", "description": "" },
-        "door_name": { "name": "Door name", "description": "" },
-        "additional_information": { "name": "Additional information", "description": "" },
-        "location": { "name": "Location", "description": "" },
-        "alternative_name": { "name": "Alternative name", "description": "Only for locks shared by another account." }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "lock_id": {
+          "name": "Lock ID",
+          "description": ""
+        },
+        "version": {
+          "name": "Version",
+          "description": ""
+        },
+        "comment": {
+          "name": "Comment",
+          "description": ""
+        },
+        "door_name": {
+          "name": "Door name",
+          "description": ""
+        },
+        "additional_information": {
+          "name": "Additional information",
+          "description": ""
+        },
+        "location": {
+          "name": "Location",
+          "description": ""
+        },
+        "alternative_name": {
+          "name": "Alternative name",
+          "description": "Only for locks shared by another account."
+        }
       }
     },
     "remove_lock": {
       "name": "Remove lock",
       "description": "Marks a lock for removal. The lock needs to be synchronized to be actually removed.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "lock_id": { "name": "Lock ID", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "lock_id": {
+          "name": "Lock ID",
+          "description": ""
+        }
       }
     },
     "abort_remove_lock": {
       "name": "Abort lock removal",
       "description": "Removes the pending removal mark from a lock.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "lock_id": { "name": "Lock ID", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "lock_id": {
+          "name": "Lock ID",
+          "description": ""
+        }
       }
     },
     "update_lock_settings": {
       "name": "Update lock settings",
       "description": "Updates the settings of a lock, such as release durations and office mode. Requires the settings' current version number.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "lock_id": { "name": "Lock ID", "description": "" },
-        "version": { "name": "Version", "description": "" },
-        "timezone": { "name": "Timezone", "description": "IANA timezone, e.g. Europe/Vienna." },
-        "holiday_calendar_enabled": { "name": "Holiday calendar enabled", "description": "" },
-        "manual_office_mode_enabled": { "name": "Manual office mode enabled", "description": "" },
-        "automatic_office_mode_enabled": { "name": "Automatic office mode enabled", "description": "" },
-        "normal_release_duration": { "name": "Normal release duration", "description": "Seconds." },
-        "extended_release_duration": { "name": "Extended release duration", "description": "Seconds." },
-        "unlock_sync_mode": { "name": "Unlock sync mode", "description": "" },
-        "rs485_log_output_enabled": { "name": "RS485 log output enabled", "description": "" },
-        "allow_handsfree_mode": { "name": "Allow handsfree mode", "description": "" },
-        "anonymize_data_in_owner_protocol": { "name": "Anonymize data in owner protocol", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "lock_id": {
+          "name": "Lock ID",
+          "description": ""
+        },
+        "version": {
+          "name": "Version",
+          "description": ""
+        },
+        "timezone": {
+          "name": "Timezone",
+          "description": "IANA timezone, e.g. Europe/Vienna."
+        },
+        "holiday_calendar_enabled": {
+          "name": "Holiday calendar enabled",
+          "description": ""
+        },
+        "manual_office_mode_enabled": {
+          "name": "Manual office mode enabled",
+          "description": ""
+        },
+        "automatic_office_mode_enabled": {
+          "name": "Automatic office mode enabled",
+          "description": ""
+        },
+        "normal_release_duration": {
+          "name": "Normal release duration",
+          "description": "Seconds."
+        },
+        "extended_release_duration": {
+          "name": "Extended release duration",
+          "description": "Seconds."
+        },
+        "unlock_sync_mode": {
+          "name": "Unlock sync mode",
+          "description": ""
+        },
+        "rs485_log_output_enabled": {
+          "name": "RS485 log output enabled",
+          "description": ""
+        },
+        "allow_handsfree_mode": {
+          "name": "Allow handsfree mode",
+          "description": ""
+        },
+        "anonymize_data_in_owner_protocol": {
+          "name": "Anonymize data in owner protocol",
+          "description": ""
+        }
       }
     },
     "assign_areas_to_lock": {
       "name": "Assign areas to lock",
       "description": "Assigns one or more areas to a lock.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "lock_id": { "name": "Lock ID", "description": "" },
-        "area_ids": { "name": "Area IDs", "description": "List of area IDs, e.g. [1, 2, 3]." }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "lock_id": {
+          "name": "Lock ID",
+          "description": ""
+        },
+        "area_ids": {
+          "name": "Area IDs",
+          "description": "List of area IDs, e.g. [1, 2, 3]."
+        }
       }
     },
     "unassign_areas_from_lock": {
       "name": "Unassign areas from lock",
       "description": "Removes the assignment of one or more areas from a lock.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "lock_id": { "name": "Lock ID", "description": "" },
-        "area_ids": { "name": "Area IDs", "description": "List of area IDs, e.g. [1, 2, 3]." }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "lock_id": {
+          "name": "Lock ID",
+          "description": ""
+        },
+        "area_ids": {
+          "name": "Area IDs",
+          "description": "List of area IDs, e.g. [1, 2, 3]."
+        }
       }
     },
     "create_sharing_code": {
       "name": "Create sharing code",
       "description": "Creates a code to share a lock with another access control system.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "lock_id": { "name": "Lock ID", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "lock_id": {
+          "name": "Lock ID",
+          "description": ""
+        }
       }
     },
     "remove_sharing_code": {
       "name": "Remove sharing code",
       "description": "Removes a previously created sharing code from a lock.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "lock_id": { "name": "Lock ID", "description": "" },
-        "sharing_code_id": { "name": "Sharing code ID", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "lock_id": {
+          "name": "Lock ID",
+          "description": ""
+        },
+        "sharing_code_id": {
+          "name": "Sharing code ID",
+          "description": ""
+        }
       }
     },
     "remove_active_shares": {
       "name": "Remove active lock shares",
       "description": "Revokes access previously shared with other access control systems for a lock.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "lock_id": { "name": "Lock ID", "description": "" },
-        "aco_ids": { "name": "Operator IDs", "description": "List of access control operator IDs to revoke, e.g. [\"ACO123\"]." }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "lock_id": {
+          "name": "Lock ID",
+          "description": ""
+        },
+        "aco_ids": {
+          "name": "Operator IDs",
+          "description": "List of access control operator IDs to revoke, e.g. [\"ACO123\"]."
+        }
       }
     },
     "add_shared_lock": {
       "name": "Add shared lock",
       "description": "Redeems a sharing code to add a lock shared by another access control system.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "sharing_code": { "name": "Sharing code", "description": "" },
-        "anonymize_data_in_owner_protocol": { "name": "Anonymize data in owner protocol", "description": "" },
-        "alternative_door_name": { "name": "Alternative door name", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "sharing_code": {
+          "name": "Sharing code",
+          "description": ""
+        },
+        "anonymize_data_in_owner_protocol": {
+          "name": "Anonymize data in owner protocol",
+          "description": ""
+        },
+        "alternative_door_name": {
+          "name": "Alternative door name",
+          "description": ""
+        }
       }
     },
     "set_holiday_calendar_active": {
       "name": "Activate or deactivate holiday calendar",
       "description": "Activates or deactivates a holiday calendar. Requires the calendar's current version number.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "holiday_calendar_id": { "name": "Holiday calendar ID", "description": "" },
-        "version": { "name": "Version", "description": "" },
-        "active": { "name": "Active", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "holiday_calendar_id": {
+          "name": "Holiday calendar ID",
+          "description": ""
+        },
+        "version": {
+          "name": "Version",
+          "description": ""
+        },
+        "active": {
+          "name": "Active",
+          "description": ""
+        }
       }
     },
     "add_holiday_calendar_slot": {
       "name": "Add holiday calendar slot",
       "description": "Adds a new slot (period) to a holiday calendar.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "holiday_calendar_id": { "name": "Holiday calendar ID", "description": "" },
-        "slot_name": { "name": "Slot name", "description": "" },
-        "valid_from": { "name": "Valid from", "description": "ISO 8601 timestamp." },
-        "valid_to": { "name": "Valid to", "description": "ISO 8601 timestamp." },
-        "series": { "name": "Recurrence series", "description": "Optional HolidayCalendarSeriesCreate object for recurring slots." }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "holiday_calendar_id": {
+          "name": "Holiday calendar ID",
+          "description": ""
+        },
+        "slot_name": {
+          "name": "Slot name",
+          "description": ""
+        },
+        "valid_from": {
+          "name": "Valid from",
+          "description": "ISO 8601 timestamp."
+        },
+        "valid_to": {
+          "name": "Valid to",
+          "description": "ISO 8601 timestamp."
+        },
+        "series": {
+          "name": "Recurrence series",
+          "description": "Optional HolidayCalendarSeriesCreate object for recurring slots."
+        }
       }
     },
     "update_holiday_calendar_slot": {
       "name": "Update holiday calendar slot",
       "description": "Updates an existing holiday calendar slot. Requires the slot's current version number.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "holiday_calendar_id": { "name": "Holiday calendar ID", "description": "" },
-        "slot_id": { "name": "Slot ID", "description": "" },
-        "version": { "name": "Version", "description": "" },
-        "slot_name": { "name": "Slot name", "description": "" },
-        "valid_from": { "name": "Valid from", "description": "" },
-        "valid_to": { "name": "Valid to", "description": "" },
-        "series": { "name": "Recurrence series", "description": "" },
-        "modify_future_slots": { "name": "Modify future slots", "description": "Apply the change to future occurrences of a recurring slot." }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "holiday_calendar_id": {
+          "name": "Holiday calendar ID",
+          "description": ""
+        },
+        "slot_id": {
+          "name": "Slot ID",
+          "description": ""
+        },
+        "version": {
+          "name": "Version",
+          "description": ""
+        },
+        "slot_name": {
+          "name": "Slot name",
+          "description": ""
+        },
+        "valid_from": {
+          "name": "Valid from",
+          "description": ""
+        },
+        "valid_to": {
+          "name": "Valid to",
+          "description": ""
+        },
+        "series": {
+          "name": "Recurrence series",
+          "description": ""
+        },
+        "modify_future_slots": {
+          "name": "Modify future slots",
+          "description": "Apply the change to future occurrences of a recurring slot."
+        }
       }
     },
     "delete_holiday_calendar_slot": {
       "name": "Delete holiday calendar slot",
       "description": "Deletes a slot from a holiday calendar.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "holiday_calendar_id": { "name": "Holiday calendar ID", "description": "" },
-        "slot_id": { "name": "Slot ID", "description": "" },
-        "delete_future_slots": { "name": "Delete future slots", "description": "Also delete future occurrences of a recurring slot." }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "holiday_calendar_id": {
+          "name": "Holiday calendar ID",
+          "description": ""
+        },
+        "slot_id": {
+          "name": "Slot ID",
+          "description": ""
+        },
+        "delete_future_slots": {
+          "name": "Delete future slots",
+          "description": "Also delete future occurrences of a recurring slot."
+        }
       }
     },
     "approve_phone_replacement": {
       "name": "Approve phone replacement",
       "description": "Approves a pending phone replacement request.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "replacement_id": { "name": "Replacement ID", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "replacement_id": {
+          "name": "Replacement ID",
+          "description": ""
+        }
       }
     },
     "reject_phone_replacement": {
       "name": "Reject phone replacement",
       "description": "Rejects a pending phone replacement request.",
       "fields": {
-        "config_entry_id": { "name": "Account", "description": "The Airkey account to act on." },
-        "replacement_id": { "name": "Replacement ID", "description": "" }
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
+        },
+        "replacement_id": {
+          "name": "Replacement ID",
+          "description": ""
+        }
       }
     }
   }

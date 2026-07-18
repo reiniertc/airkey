@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_API_KEY, CONF_SCAN_INTERVAL, Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import AirkeyApiClient, AirkeyAuthError, AirkeyError
@@ -16,12 +17,15 @@ from .const import (
     CONF_EVENT_LOOKBACK_HOURS,
     DEFAULT_EVENT_LOOKBACK_HOURS,
     DEFAULT_SCAN_INTERVAL_MINUTES,
+    DOMAIN,
     ENV_PRODUCTION,
 )
 from .coordinator import AirkeyDataUpdateCoordinator
 from .services import async_setup_services
 
 _LOGGER = logging.getLogger(__name__)
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 PLATFORMS: list[Platform] = [
     Platform.SENSOR,

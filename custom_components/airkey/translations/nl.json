@@ -285,7 +285,7 @@
         },
         "authorization_info": {
           "name": "Autorisatie-informatie",
-          "description": "De autorisatiedefinitie, bijv. {\"type\": \"PERMANENT\"}. Zie de Airkey API-referentie voor de velden van PERMANENT/PERIODICAL/ONE_DAY/SIMPLE."
+          "description": "De autorisatiedefinitie, bijv. type: PERMANENT. Zie de Airkey API-referentie voor de velden van PERMANENT/PERIODICAL/ONE_DAY/SIMPLE, of het voorbeeld bij dit veld."
         }
       }
     },
@@ -633,7 +633,7 @@
         },
         "authorization": {
           "name": "Autorisatie",
-          "description": "Optioneel FixedMediumSimpleAuthorizationCreate-object, bijv. {\"lockId\": 1, \"authorizationInfo\": {\"type\": \"PERMANENT\"}}."
+          "description": "Optioneel FixedMediumSimpleAuthorizationCreate-object, zie het voorbeeld bij dit veld."
         },
         "mail_subject": {
           "name": "E-mailonderwerp",
