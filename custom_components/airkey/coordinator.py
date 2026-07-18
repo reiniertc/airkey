@@ -15,10 +15,13 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from .api import AirkeyApiClient, AirkeyAuthError, AirkeyError, AirkeyRateLimitError
 from .const import (
     CONF_EVENT_LOOKBACK_HOURS,
+    CONF_LOCK_DETAILS_INTERVAL_HOURS,
     DEFAULT_EVENT_LOOKBACK_HOURS,
+    DEFAULT_LOCK_DETAILS_INTERVAL_HOURS,
     DEFAULT_SCAN_INTERVAL_MINUTES,
     DOMAIN,
     LOCK_PROTOCOL_LOOKBACK_DAYS,
+    MIN_LOCK_DETAILS_INTERVAL_HOURS,
     MIN_SCAN_INTERVAL_MINUTES,
     SUCCESSFUL_UNLOCK_EVENT_TYPES,
 )
@@ -67,6 +70,8 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
         self.entry = entry
         self.client = client
         self._last_event_poll: str | None = None
+        self._last_lock_details_poll: datetime | None = None
+        self._force_lock_details_refresh = False
 
         scan_minutes = max(
             entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL_MINUTES),
@@ -78,6 +83,15 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
             name=DOMAIN,
             update_interval=timedelta(minutes=scan_minutes),
         )
+
+    async def async_refresh_lock_details(self) -> None:
+        """Force an immediate refresh of the per-lock usage/area data.
+
+        Normally these are only refreshed on their own (much longer) interval
+        to limit how many extra API calls a refresh cycle costs.
+        """
+        self._force_lock_details_refresh = True
+        await self.async_request_refresh()
 
     async def _async_update_data(self) -> AirkeyData:
         if self._last_event_poll:
@@ -119,8 +133,31 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
         if events:
             latest_event = max(events, key=lambda event: event.get("timestamp") or "")
 
-        lock_last_used, medium_last_used = await self._async_fetch_last_used(locks)
-        area_locks = await self._async_fetch_area_locks(locks)
+        lock_details_interval = timedelta(
+            hours=max(
+                self.entry.options.get(
+                    CONF_LOCK_DETAILS_INTERVAL_HOURS,
+                    DEFAULT_LOCK_DETAILS_INTERVAL_HOURS,
+                ),
+                MIN_LOCK_DETAILS_INTERVAL_HOURS,
+            )
+        )
+        now = datetime.now(UTC)
+        should_refresh_lock_details = (
+            self._force_lock_details_refresh
+            or self._last_lock_details_poll is None
+            or now - self._last_lock_details_poll >= lock_details_interval
+        )
+
+        if should_refresh_lock_details:
+            lock_last_used, medium_last_used = await self._async_fetch_last_used(locks)
+            area_locks = await self._async_fetch_area_locks(locks)
+            self._last_lock_details_poll = now
+            self._force_lock_details_refresh = False
+        else:
+            lock_last_used = self.data.lock_last_used if self.data else {}
+            medium_last_used = self.data.medium_last_used if self.data else {}
+            area_locks = self.data.area_locks if self.data else {}
 
         return AirkeyData(
             customer=customer or {},

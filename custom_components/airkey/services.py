@@ -51,6 +51,7 @@ from .const import (
     SERVICE_GENERATE_PHONE_PAIRING_CODE,
     SERVICE_REACTIVATE_MEDIUM,
     SERVICE_REFRESH,
+    SERVICE_REFRESH_LOCK_DETAILS,
     SERVICE_REJECT_PHONE_REPLACEMENT,
     SERVICE_REMOVE_ACTIVE_SHARES,
     SERVICE_REMOVE_LOCK,
@@ -134,6 +135,17 @@ def async_setup_services(hass: HomeAssistant) -> None:
 
     hass.services.async_register(
         DOMAIN, SERVICE_REFRESH, handle_refresh, schema=BASE_SCHEMA
+    )
+
+    async def handle_refresh_lock_details(call: ServiceCall) -> None:
+        entry = _get_entry(hass, call)
+        await entry.runtime_data.coordinator.async_refresh_lock_details()
+
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_REFRESH_LOCK_DETAILS,
+        handle_refresh_lock_details,
+        schema=BASE_SCHEMA,
     )
 
     async def handle_reset_test_data(call: ServiceCall) -> None:

@@ -41,7 +41,8 @@
         "title": "Airkey options",
         "data": {
           "scan_interval": "Polling interval (minutes)",
-          "event_lookback_hours": "Event lookback window on first refresh (hours)"
+          "event_lookback_hours": "Event lookback window on first refresh (hours)",
+          "lock_details_interval_hours": "Lock usage refresh interval (hours)"
         }
       }
     }
@@ -148,6 +149,16 @@
         "config_entry_id": {
           "name": "Account",
           "description": "The Airkey account to refresh."
+        }
+      }
+    },
+    "refresh_lock_details": {
+      "name": "Refresh lock usage details",
+      "description": "Forces an immediate refresh of the per-lock \"last used\" and area-assignment data, which normally only refreshes once a day to limit API usage.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "The Airkey account to act on."
         }
       }
     },
