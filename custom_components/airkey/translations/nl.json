@@ -1,0 +1,1051 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Verbinden met EVVA Airkey",
+        "description": "Voer je Airkey Cloud API-sleutel in. Maak er een aan in de Airkey Online Administration onder Instellingen > Interfaces.",
+        "data": {
+          "api_key": "API-sleutel",
+          "environment": "Omgeving"
+        }
+      },
+      "reauth_confirm": {
+        "title": "EVVA Airkey opnieuw verifiëren",
+        "description": "De API-sleutel voor de omgeving '{environment}' is niet meer geldig. Voer een nieuwe in.",
+        "data": {
+          "api_key": "API-sleutel"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Ongeldige of verlopen API-sleutel",
+      "cannot_connect": "Kon geen verbinding maken met de Airkey Cloud API",
+      "unknown": "Onverwachte fout"
+    },
+    "abort": {
+      "already_configured": "Dit Airkey-account is al geconfigureerd",
+      "reauth_successful": "Opnieuw verifiëren is gelukt"
+    }
+  },
+  "selector": {
+    "environment": {
+      "options": {
+        "production": "Productie",
+        "test": "Test/integratie (gratis)"
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Airkey-opties",
+        "data": {
+          "scan_interval": "Ophaalinterval (minuten)",
+          "event_lookback_hours": "Terugkijkperiode voor gebeurtenissen bij eerste refresh (uren)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "credits": {
+        "name": "Credits"
+      },
+      "persons": {
+        "name": "Personen"
+      },
+      "cards": {
+        "name": "Kaarten"
+      },
+      "phones": {
+        "name": "Telefoons"
+      },
+      "locks": {
+        "name": "Sloten"
+      },
+      "areas": {
+        "name": "Areas"
+      },
+      "authorizations": {
+        "name": "Autorisaties"
+      },
+      "blacklist_entries": {
+        "name": "Blacklist-vermeldingen"
+      },
+      "maintenance_tasks": {
+        "name": "Onderhoudstaken"
+      },
+      "holiday_calendars": {
+        "name": "Feestdagenkalenders"
+      },
+      "pending_phone_replacements": {
+        "name": "Openstaande telefoonvervangingen"
+      },
+      "operators": {
+        "name": "Toegangscontroleoperators"
+      },
+      "last_event": {
+        "name": "Laatste gebeurtenis"
+      },
+      "account": {
+        "name": "Account"
+      },
+      "lock": {
+        "name": "Slot"
+      }
+    },
+    "binary_sensor": {
+      "maintenance_required": {
+        "name": "Onderhoud vereist"
+      },
+      "pending_phone_replacements": {
+        "name": "Openstaande telefoonvervangingen"
+      },
+      "two_factor_active": {
+        "name": "Tweefactorauthenticatie actief"
+      },
+      "four_eyes_enabled": {
+        "name": "Vier-ogen-principe ingeschakeld"
+      },
+      "removal_requested": {
+        "name": "Verwijdering aangevraagd"
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Data verversen"
+      },
+      "reset_test_data": {
+        "name": "Testdata resetten"
+      }
+    },
+    "event": {
+      "access_events": {
+        "name": "Toegangsgebeurtenissen",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "unlocking": "Ontgrendeling",
+              "app_paired": "App gekoppeld",
+              "authorization_synchronized": "Autorisatie gesynchroniseerd"
+            }
+          }
+        }
+      }
+    }
+  },
+  "issues": {
+    "write_access_denied": {
+      "title": "Airkey API-sleutel heeft geen schrijftoegang",
+      "description": "De Airkey API-sleutel voor '{title}' heeft een schrijfverzoek geweigerd (HTTP 403). Gratis/alleen-lezen Airkey-contracten kunnen alleen worden gebruikt om te monitoren; het aanmaken, bijwerken of verwijderen van data vereist een productie-API-sleutel met schrijftoegang. Upgrade je Airkey Cloud Interface-licentie of gebruik een sleutel die schrijfrechten heeft gekregen."
+    }
+  },
+  "services": {
+    "refresh": {
+      "name": "Data verversen",
+      "description": "Forceert een directe refresh van alle Airkey-data voor dit account.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account dat ververst moet worden."
+        }
+      }
+    },
+    "reset_test_data": {
+      "name": "Testdata resetten",
+      "description": "Reset de vooraf gedefinieerde testdata van de gratis Airkey-integratie-/testomgeving. Heeft geen effect op productieaccounts.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-testaccount."
+        }
+      }
+    },
+    "create_person": {
+      "name": "Persoon aanmaken",
+      "description": "Maakt een nieuwe persoon aan in het toegangscontrolesysteem.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "first_name": {
+          "name": "Voornaam",
+          "description": "Voornaam van de persoon."
+        },
+        "last_name": {
+          "name": "Achternaam",
+          "description": "Achternaam van de persoon."
+        },
+        "correspondence_language_code": {
+          "name": "Correspondentietaal",
+          "description": "Taal gebruikt voor e-mails/sms's naar deze persoon."
+        },
+        "secondary_identification": {
+          "name": "Secundaire identificatie",
+          "description": "Bijvoorbeeld een medewerkers- of badgenummer."
+        },
+        "gender": {
+          "name": "Geslacht",
+          "description": ""
+        },
+        "birthday": {
+          "name": "Geboortedatum",
+          "description": "Formaat jjjj-mm-dd."
+        },
+        "phone": {
+          "name": "Telefoonnummer",
+          "description": ""
+        },
+        "email_address": {
+          "name": "E-mailadres",
+          "description": ""
+        },
+        "street": {
+          "name": "Straat",
+          "description": ""
+        },
+        "postal_code": {
+          "name": "Postcode",
+          "description": ""
+        },
+        "city": {
+          "name": "Plaats",
+          "description": ""
+        },
+        "country_code": {
+          "name": "Landcode",
+          "description": "ISO 3166-1 alpha-3, bijv. NLD."
+        },
+        "comment": {
+          "name": "Opmerking",
+          "description": ""
+        }
+      }
+    },
+    "update_person": {
+      "name": "Persoon bijwerken",
+      "description": "Werkt een bestaande persoon bij. Vereist het huidige versienummer van de persoon.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "person_id": {
+          "name": "Persoon-ID",
+          "description": ""
+        },
+        "version": {
+          "name": "Versie",
+          "description": "Huidig versienummer, zie de attributen van de personen-sensor."
+        }
+      }
+    },
+    "delete_person": {
+      "name": "Persoon verwijderen",
+      "description": "Verwijdert een persoon uit het toegangscontrolesysteem.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "person_id": {
+          "name": "Persoon-ID",
+          "description": ""
+        }
+      }
+    },
+    "create_simple_authorization": {
+      "name": "Eenvoudige autorisatie aanmaken",
+      "description": "Geeft een medium toegang tot een slot of area via een eenvoudige (permanente, periodieke, eendaagse of vaste) autorisatie.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "medium_id": {
+          "name": "Medium-ID",
+          "description": ""
+        },
+        "lock_id": {
+          "name": "Slot-ID",
+          "description": "Stel een slot óf een area in."
+        },
+        "area_id": {
+          "name": "Area-ID",
+          "description": "Stel een slot óf een area in."
+        },
+        "remove_all_existing_authorizations_for_pair": {
+          "name": "Bestaande autorisaties verwijderen",
+          "description": "Verwijdert eerst alle andere autorisaties voor dit medium/slot- of medium/area-paar."
+        },
+        "push_message": {
+          "name": "Pushbericht",
+          "description": "Optionele pushmelding-tekst voor de app."
+        },
+        "authorization_info": {
+          "name": "Autorisatie-informatie",
+          "description": "De autorisatiedefinitie, bijv. {\"type\": \"PERMANENT\"}. Zie de Airkey API-referentie voor de velden van PERMANENT/PERIODICAL/ONE_DAY/SIMPLE."
+        }
+      }
+    },
+    "create_advanced_authorization": {
+      "name": "Geavanceerde autorisaties aanmaken of bijwerken",
+      "description": "Maakt en/of werkt meerdere autorisaties in één keer bij. Accepteert de ruwe Airkey API-requestlijsten.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "authorization_create_list": {
+          "name": "Aan te maken autorisaties",
+          "description": "Lijst volgens het Airkey AuthorizationCreate-schema."
+        },
+        "authorization_update_list": {
+          "name": "Bij te werken autorisaties",
+          "description": "Lijst volgens het Airkey Authorization-schema."
+        },
+        "push_message": {
+          "name": "Pushbericht",
+          "description": "Optionele pushmelding-tekst voor de app."
+        }
+      }
+    },
+    "delete_authorization": {
+      "name": "Autorisatie verwijderen",
+      "description": "Vraagt verwijdering aan van een bestaande autorisatie.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "authorization_id": {
+          "name": "Autorisatie-ID",
+          "description": ""
+        },
+        "deletion_requested": {
+          "name": "Verwijdering aangevraagd",
+          "description": ""
+        }
+      }
+    },
+    "assign_medium": {
+      "name": "Medium toewijzen aan persoon",
+      "description": "Wijst een kaart of telefoon toe aan een persoon.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "medium_id": {
+          "name": "Medium-ID",
+          "description": ""
+        },
+        "person_id": {
+          "name": "Persoon-ID",
+          "description": ""
+        }
+      }
+    },
+    "cancel_medium_assignment": {
+      "name": "Toewijzing van medium annuleren",
+      "description": "Annuleert de toewijzing van een medium aan de bijbehorende persoon.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "medium_id": {
+          "name": "Medium-ID",
+          "description": ""
+        }
+      }
+    },
+    "deactivate_medium": {
+      "name": "Medium deactiveren",
+      "description": "Deactiveert een kaart of telefoon, bijvoorbeeld bij verlies.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "medium_id": {
+          "name": "Medium-ID",
+          "description": ""
+        },
+        "reason": {
+          "name": "Reden",
+          "description": "Vrije tekst als reden, opgeslagen in het mediumprotocol."
+        },
+        "comment": {
+          "name": "Opmerking",
+          "description": ""
+        }
+      }
+    },
+    "reactivate_medium": {
+      "name": "Medium reactiveren",
+      "description": "Reactiveert een eerder gedeactiveerd medium.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "medium_id": {
+          "name": "Medium-ID",
+          "description": ""
+        },
+        "reason": {
+          "name": "Reden",
+          "description": ""
+        },
+        "recover_authorizations": {
+          "name": "Autorisaties herstellen",
+          "description": "Herstelt de autorisaties die het medium had vóór deactivering."
+        },
+        "comment": {
+          "name": "Opmerking",
+          "description": ""
+        }
+      }
+    },
+    "empty_medium": {
+      "name": "Medium leegmaken",
+      "description": "Verwijdert alle autorisaties van een medium zonder het te verwijderen.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "medium_id": {
+          "name": "Medium-ID",
+          "description": ""
+        }
+      }
+    },
+    "update_card": {
+      "name": "Kaart bijwerken",
+      "description": "Werkt de eigenschappen van een bestaande kaart bij. Vereist het huidige versienummer van de kaart.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "medium_id": {
+          "name": "Medium-ID",
+          "description": ""
+        },
+        "version": {
+          "name": "Versie",
+          "description": ""
+        },
+        "name": {
+          "name": "Naam",
+          "description": ""
+        },
+        "comment": {
+          "name": "Opmerking",
+          "description": ""
+        },
+        "release_duration_extended": {
+          "name": "Verlengde openingsduur",
+          "description": ""
+        },
+        "permanent_opening_enabled": {
+          "name": "Permanent openen ingeschakeld",
+          "description": ""
+        }
+      }
+    },
+    "add_phone": {
+      "name": "Telefoon toevoegen",
+      "description": "Registreert een nieuwe telefoon als medium.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "phone_number": {
+          "name": "Telefoonnummer",
+          "description": "Internationaal formaat, bijv. +31612345678."
+        },
+        "name": {
+          "name": "Naam",
+          "description": ""
+        }
+      }
+    },
+    "update_phone": {
+      "name": "Telefoon bijwerken",
+      "description": "Werkt de eigenschappen van een bestaande telefoon bij. Vereist het huidige versienummer van de telefoon.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "medium_id": {
+          "name": "Medium-ID",
+          "description": ""
+        },
+        "version": {
+          "name": "Versie",
+          "description": ""
+        },
+        "phone_number": {
+          "name": "Telefoonnummer",
+          "description": ""
+        },
+        "name": {
+          "name": "Naam",
+          "description": ""
+        },
+        "comment": {
+          "name": "Opmerking",
+          "description": ""
+        },
+        "release_duration_extended": {
+          "name": "Verlengde openingsduur",
+          "description": ""
+        },
+        "permanent_opening_enabled": {
+          "name": "Permanent openen ingeschakeld",
+          "description": ""
+        },
+        "in_maintenance_mode": {
+          "name": "In onderhoudsmodus",
+          "description": ""
+        },
+        "medium_log_visible": {
+          "name": "Mediumlog zichtbaar",
+          "description": ""
+        }
+      }
+    },
+    "delete_phone": {
+      "name": "Telefoon verwijderen",
+      "description": "Verwijdert een telefoon-medium.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "medium_id": {
+          "name": "Medium-ID",
+          "description": ""
+        }
+      }
+    },
+    "generate_phone_pairing_code": {
+      "name": "Koppelcode voor telefoon genereren",
+      "description": "Genereert een nieuwe koppelcode voor een telefoon.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "medium_id": {
+          "name": "Medium-ID",
+          "description": ""
+        }
+      }
+    },
+    "reset_phone_pin": {
+      "name": "Telefoon-pincode resetten",
+      "description": "Reset de pincode van een telefoon.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "medium_id": {
+          "name": "Medium-ID",
+          "description": ""
+        }
+      }
+    },
+    "send_registration_code_mail": {
+      "name": "Registratiecode versturen per e-mail",
+      "description": "Verstuurt de AirKey-app-registratiecode per e-mail naar de eigenaar van de telefoon.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "medium_id": {
+          "name": "Medium-ID",
+          "description": ""
+        },
+        "mail_subject": {
+          "name": "E-mailonderwerp",
+          "description": "Laat leeg om de standaardtekst van het account te gebruiken."
+        },
+        "mail_text": {
+          "name": "E-mailtekst",
+          "description": "Laat leeg om de standaardtekst van het account te gebruiken."
+        }
+      }
+    },
+    "send_registration_code_sms": {
+      "name": "Registratiecode versturen per sms",
+      "description": "Verstuurt de AirKey-app-registratiecode per sms naar de telefoon.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "medium_id": {
+          "name": "Medium-ID",
+          "description": ""
+        },
+        "sms_text": {
+          "name": "Sms-tekst",
+          "description": "Laat leeg om de standaardtekst van het account te gebruiken."
+        }
+      }
+    },
+    "send_a_key_mail": {
+      "name": "Sleutel versturen per e-mail",
+      "description": "Maakt in één keer een persoon, telefoon en autorisatie (indien nodig) aan en e-mailt een registratiecode.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "phone_number": {
+          "name": "Telefoonnummer",
+          "description": ""
+        },
+        "first_name": {
+          "name": "Voornaam",
+          "description": ""
+        },
+        "last_name": {
+          "name": "Achternaam",
+          "description": ""
+        },
+        "email_address": {
+          "name": "E-mailadres",
+          "description": ""
+        },
+        "correspondence_language_code": {
+          "name": "Correspondentietaal",
+          "description": ""
+        },
+        "authorization": {
+          "name": "Autorisatie",
+          "description": "Optioneel FixedMediumSimpleAuthorizationCreate-object, bijv. {\"lockId\": 1, \"authorizationInfo\": {\"type\": \"PERMANENT\"}}."
+        },
+        "mail_subject": {
+          "name": "E-mailonderwerp",
+          "description": ""
+        },
+        "mail_text": {
+          "name": "E-mailtekst",
+          "description": ""
+        }
+      }
+    },
+    "send_a_key_sms": {
+      "name": "Sleutel versturen per sms",
+      "description": "Maakt in één keer een telefoon en autorisatie (indien nodig) aan en stuurt een registratiecode per sms.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "phone_number": {
+          "name": "Telefoonnummer",
+          "description": ""
+        },
+        "person": {
+          "name": "Persoon",
+          "description": "Optioneel PersonCreate-object voor een nieuwe persoon."
+        },
+        "authorization": {
+          "name": "Autorisatie",
+          "description": "Optioneel FixedMediumSimpleAuthorizationCreate-object."
+        },
+        "sms_text": {
+          "name": "Sms-tekst",
+          "description": ""
+        }
+      }
+    },
+    "update_lock": {
+      "name": "Slot bijwerken",
+      "description": "Werkt de eigenschappen van een slot bij. Vereist het huidige versienummer van het slot.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "lock_id": {
+          "name": "Slot-ID",
+          "description": ""
+        },
+        "version": {
+          "name": "Versie",
+          "description": ""
+        },
+        "comment": {
+          "name": "Opmerking",
+          "description": ""
+        },
+        "door_name": {
+          "name": "Deurnaam",
+          "description": ""
+        },
+        "additional_information": {
+          "name": "Aanvullende informatie",
+          "description": ""
+        },
+        "location": {
+          "name": "Locatie",
+          "description": ""
+        },
+        "alternative_name": {
+          "name": "Alternatieve naam",
+          "description": "Alleen voor sloten die door een ander account zijn gedeeld."
+        }
+      }
+    },
+    "remove_lock": {
+      "name": "Slot verwijderen",
+      "description": "Markeert een slot voor verwijdering. Het slot moet gesynchroniseerd worden om daadwerkelijk verwijderd te worden.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "lock_id": {
+          "name": "Slot-ID",
+          "description": ""
+        }
+      }
+    },
+    "abort_remove_lock": {
+      "name": "Verwijdering van slot annuleren",
+      "description": "Verwijdert de markering voor verwijdering van een slot.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "lock_id": {
+          "name": "Slot-ID",
+          "description": ""
+        }
+      }
+    },
+    "update_lock_settings": {
+      "name": "Slotinstellingen bijwerken",
+      "description": "Werkt de instellingen van een slot bij, zoals openingsduur en kantoormodus. Vereist het huidige versienummer van de instellingen.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "lock_id": {
+          "name": "Slot-ID",
+          "description": ""
+        },
+        "version": {
+          "name": "Versie",
+          "description": ""
+        },
+        "timezone": {
+          "name": "Tijdzone",
+          "description": "IANA-tijdzone, bijv. Europe/Amsterdam."
+        },
+        "holiday_calendar_enabled": {
+          "name": "Feestdagenkalender ingeschakeld",
+          "description": ""
+        },
+        "manual_office_mode_enabled": {
+          "name": "Handmatige kantoormodus ingeschakeld",
+          "description": ""
+        },
+        "automatic_office_mode_enabled": {
+          "name": "Automatische kantoormodus ingeschakeld",
+          "description": ""
+        },
+        "normal_release_duration": {
+          "name": "Normale openingsduur",
+          "description": "Seconden."
+        },
+        "extended_release_duration": {
+          "name": "Verlengde openingsduur",
+          "description": "Seconden."
+        },
+        "unlock_sync_mode": {
+          "name": "Ontgrendel-synchronisatiemodus",
+          "description": ""
+        },
+        "rs485_log_output_enabled": {
+          "name": "RS485-loguitvoer ingeschakeld",
+          "description": ""
+        },
+        "allow_handsfree_mode": {
+          "name": "Handsfree-modus toestaan",
+          "description": ""
+        },
+        "anonymize_data_in_owner_protocol": {
+          "name": "Gegevens anonimiseren in eigenaarsprotocol",
+          "description": ""
+        }
+      }
+    },
+    "assign_areas_to_lock": {
+      "name": "Areas toewijzen aan slot",
+      "description": "Wijst een of meer areas toe aan een slot.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "lock_id": {
+          "name": "Slot-ID",
+          "description": ""
+        },
+        "area_ids": {
+          "name": "Area-ID's",
+          "description": "Lijst met area-ID's, bijv. [1, 2, 3]."
+        }
+      }
+    },
+    "unassign_areas_from_lock": {
+      "name": "Areas ontkoppelen van slot",
+      "description": "Verwijdert de toewijzing van een of meer areas van een slot.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "lock_id": {
+          "name": "Slot-ID",
+          "description": ""
+        },
+        "area_ids": {
+          "name": "Area-ID's",
+          "description": "Lijst met area-ID's, bijv. [1, 2, 3]."
+        }
+      }
+    },
+    "create_sharing_code": {
+      "name": "Deelcode aanmaken",
+      "description": "Maakt een code aan om een slot te delen met een ander toegangscontrolesysteem.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "lock_id": {
+          "name": "Slot-ID",
+          "description": ""
+        }
+      }
+    },
+    "remove_sharing_code": {
+      "name": "Deelcode verwijderen",
+      "description": "Verwijdert een eerder aangemaakte deelcode van een slot.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "lock_id": {
+          "name": "Slot-ID",
+          "description": ""
+        },
+        "sharing_code_id": {
+          "name": "Deelcode-ID",
+          "description": ""
+        }
+      }
+    },
+    "remove_active_shares": {
+      "name": "Actieve slotdelingen verwijderen",
+      "description": "Herroept toegang die eerder is gedeeld met andere toegangscontrolesystemen voor een slot.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "lock_id": {
+          "name": "Slot-ID",
+          "description": ""
+        },
+        "aco_ids": {
+          "name": "Operator-ID's",
+          "description": "Lijst met te herroepen toegangscontroleoperator-ID's, bijv. [\"ACO123\"]."
+        }
+      }
+    },
+    "add_shared_lock": {
+      "name": "Gedeeld slot toevoegen",
+      "description": "Verzilvert een deelcode om een slot toe te voegen dat door een ander toegangscontrolesysteem is gedeeld.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "sharing_code": {
+          "name": "Deelcode",
+          "description": ""
+        },
+        "anonymize_data_in_owner_protocol": {
+          "name": "Gegevens anonimiseren in eigenaarsprotocol",
+          "description": ""
+        },
+        "alternative_door_name": {
+          "name": "Alternatieve deurnaam",
+          "description": ""
+        }
+      }
+    },
+    "set_holiday_calendar_active": {
+      "name": "Feestdagenkalender activeren of deactiveren",
+      "description": "Activeert of deactiveert een feestdagenkalender. Vereist het huidige versienummer van de kalender.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "holiday_calendar_id": {
+          "name": "Feestdagenkalender-ID",
+          "description": ""
+        },
+        "version": {
+          "name": "Versie",
+          "description": ""
+        },
+        "active": {
+          "name": "Actief",
+          "description": ""
+        }
+      }
+    },
+    "add_holiday_calendar_slot": {
+      "name": "Feestdagenkalenderslot toevoegen",
+      "description": "Voegt een nieuw slot (periode) toe aan een feestdagenkalender.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "holiday_calendar_id": {
+          "name": "Feestdagenkalender-ID",
+          "description": ""
+        },
+        "slot_name": {
+          "name": "Slotnaam",
+          "description": ""
+        },
+        "valid_from": {
+          "name": "Geldig vanaf",
+          "description": "ISO 8601-tijdstempel."
+        },
+        "valid_to": {
+          "name": "Geldig tot",
+          "description": "ISO 8601-tijdstempel."
+        },
+        "series": {
+          "name": "Herhalingsreeks",
+          "description": "Optioneel HolidayCalendarSeriesCreate-object voor terugkerende sloten."
+        }
+      }
+    },
+    "update_holiday_calendar_slot": {
+      "name": "Feestdagenkalenderslot bijwerken",
+      "description": "Werkt een bestaand feestdagenkalenderslot bij. Vereist het huidige versienummer van het slot.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "holiday_calendar_id": {
+          "name": "Feestdagenkalender-ID",
+          "description": ""
+        },
+        "slot_id": {
+          "name": "Slot-ID",
+          "description": ""
+        },
+        "version": {
+          "name": "Versie",
+          "description": ""
+        },
+        "slot_name": {
+          "name": "Slotnaam",
+          "description": ""
+        },
+        "valid_from": {
+          "name": "Geldig vanaf",
+          "description": ""
+        },
+        "valid_to": {
+          "name": "Geldig tot",
+          "description": ""
+        },
+        "series": {
+          "name": "Herhalingsreeks",
+          "description": ""
+        },
+        "modify_future_slots": {
+          "name": "Toekomstige sloten wijzigen",
+          "description": "Pas de wijziging toe op toekomstige herhalingen van een terugkerend slot."
+        }
+      }
+    },
+    "delete_holiday_calendar_slot": {
+      "name": "Feestdagenkalenderslot verwijderen",
+      "description": "Verwijdert een slot uit een feestdagenkalender.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "holiday_calendar_id": {
+          "name": "Feestdagenkalender-ID",
+          "description": ""
+        },
+        "slot_id": {
+          "name": "Slot-ID",
+          "description": ""
+        },
+        "delete_future_slots": {
+          "name": "Toekomstige sloten verwijderen",
+          "description": "Verwijder ook toekomstige herhalingen van een terugkerend slot."
+        }
+      }
+    },
+    "approve_phone_replacement": {
+      "name": "Telefoonvervanging goedkeuren",
+      "description": "Keurt een openstaand verzoek tot telefoonvervanging goed.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "replacement_id": {
+          "name": "Vervangings-ID",
+          "description": ""
+        }
+      }
+    },
+    "reject_phone_replacement": {
+      "name": "Telefoonvervanging afwijzen",
+      "description": "Wijst een openstaand verzoek tot telefoonvervanging af.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
+        },
+        "replacement_id": {
+          "name": "Vervangings-ID",
+          "description": ""
+        }
+      }
+    }
+  }
+}
