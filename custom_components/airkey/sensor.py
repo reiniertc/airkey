@@ -141,6 +141,26 @@ SENSOR_DESCRIPTIONS: tuple[AirkeySensorEntityDescription, ...] = (
         translation_key="authorizations",
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda d: len(d.authorizations),
+        attrs_fn=lambda d: {
+            "authorizations": [
+                {
+                    "id": a.get("id"),
+                    "person_id": a.get("personId"),
+                    "person_name": _person_names_by_id(d.persons).get(
+                        a.get("personId")
+                    ),
+                    "medium_id": (a.get("medium") or {}).get("id"),
+                    "medium_name": (a.get("medium") or {}).get("name")
+                    or (a.get("medium") or {}).get("mediumIdentifier"),
+                    "lock_id": (a.get("lock") or {}).get("id"),
+                    "lock_name": (a.get("lock") or {}).get("name"),
+                    "area_id": (a.get("area") or {}).get("id"),
+                    "area_name": (a.get("area") or {}).get("name"),
+                    "state": a.get("currentState"),
+                }
+                for a in d.authorizations
+            ]
+        },
     ),
     AirkeySensorEntityDescription(
         key="blacklist_entries",
