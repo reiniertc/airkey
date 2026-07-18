@@ -54,6 +54,8 @@ class AirkeyData:
     lock_last_used: dict[int, dict] = field(default_factory=dict)
     # medium_id -> {"timestamp", "lock_id", "lock_name", "event_type"}
     medium_last_used: dict[int, dict] = field(default_factory=dict)
+    # area_id -> [{"id": lock_id, "name": lock_name}, ...]
+    area_locks: dict[int, list[dict]] = field(default_factory=dict)
 
 
 class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
@@ -118,6 +120,7 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
             latest_event = max(events, key=lambda event: event.get("timestamp") or "")
 
         lock_last_used, medium_last_used = await self._async_fetch_last_used(locks)
+        area_locks = await self._async_fetch_area_locks(locks)
 
         return AirkeyData(
             customer=customer or {},
@@ -138,6 +141,7 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
             latest_event=latest_event,
             lock_last_used=lock_last_used,
             medium_last_used=medium_last_used,
+            area_locks=area_locks,
         )
 
     async def _async_fetch_last_used(
@@ -206,3 +210,43 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
             }
 
         return lock_last_used, medium_last_used
+
+    async def _async_fetch_area_locks(self, locks: list[dict]) -> dict[int, list[dict]]:
+        """Build a reverse index of area_id -> the locks assigned to that area.
+
+        There is no bulk "locks per area" endpoint, only a per-lock
+        "assigned areas" one, so this is queried per lock and inverted.
+        """
+        area_locks: dict[int, list[dict]] = {}
+
+        for lock in locks:
+            lock_id = lock.get("id")
+            if lock_id is None:
+                continue
+            door = lock.get("lockDoor") or {}
+            lock_name = (
+                door.get("name") or door.get("alternativeName") or f"Lock {lock_id}"
+            )
+            try:
+                assigned_areas = await self.client.get_lock_assigned_areas(lock_id)
+            except AirkeyRateLimitError:
+                _LOGGER.warning(
+                    "Airkey API rate limited while fetching area assignments; "
+                    "skipping remaining locks this cycle"
+                )
+                break
+            except AirkeyError as err:
+                _LOGGER.debug(
+                    "Could not fetch assigned areas for lock %s: %s", lock_id, err
+                )
+                continue
+
+            for area in assigned_areas:
+                area_id = area.get("id")
+                if area_id is None:
+                    continue
+                area_locks.setdefault(area_id, []).append(
+                    {"id": lock_id, "name": lock_name}
+                )
+
+        return area_locks

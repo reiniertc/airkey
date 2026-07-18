@@ -33,6 +33,66 @@ def _person_names_by_id(persons: list[dict]) -> dict[int, str]:
     return {p.get("id"): _person_name(p) for p in persons}
 
 
+def _expand_authorizations(d: AirkeyData) -> list[dict]:
+    """Flatten authorizations to one row per (person, lock, medium).
+
+    Area-level authorizations (no specific lock) are expanded into one row
+    per lock known to be assigned to that area, using AirkeyData.area_locks,
+    so consumers don't need to separately resolve "access to area X" into
+    the individual locks that live in it.
+    """
+    person_names = _person_names_by_id(d.persons)
+    rows: list[dict] = []
+    for a in d.authorizations:
+        base = {
+            "id": a.get("id"),
+            "person_id": a.get("personId"),
+            "person_name": person_names.get(a.get("personId")),
+            "medium_id": (a.get("medium") or {}).get("id"),
+            "medium_name": (a.get("medium") or {}).get("name")
+            or (a.get("medium") or {}).get("mediumIdentifier"),
+            "state": a.get("currentState"),
+        }
+        lock = a.get("lock") or {}
+        area = a.get("area") or {}
+        area_id = area.get("id")
+
+        if lock.get("id") is not None:
+            rows.append(
+                {
+                    **base,
+                    "lock_id": lock.get("id"),
+                    "lock_name": lock.get("name"),
+                    "area_id": area_id,
+                    "area_name": area.get("name"),
+                }
+            )
+        elif area_id is not None and d.area_locks.get(area_id):
+            for area_lock in d.area_locks[area_id]:
+                rows.append(
+                    {
+                        **base,
+                        "lock_id": area_lock["id"],
+                        "lock_name": area_lock["name"],
+                        "area_id": area_id,
+                        "area_name": area.get("name"),
+                    }
+                )
+        else:
+            # Neither a specific lock nor a resolvable area (e.g. an area with
+            # no locks known yet) - keep as-is so the record isn't lost.
+            rows.append(
+                {
+                    **base,
+                    "lock_id": None,
+                    "lock_name": None,
+                    "area_id": area_id,
+                    "area_name": area.get("name"),
+                }
+            )
+    return rows
+
+
 @dataclass(frozen=True, kw_only=True)
 class AirkeySensorEntityDescription(SensorEntityDescription):
     """Describes an Airkey hub-level sensor."""
@@ -141,26 +201,7 @@ SENSOR_DESCRIPTIONS: tuple[AirkeySensorEntityDescription, ...] = (
         translation_key="authorizations",
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda d: len(d.authorizations),
-        attrs_fn=lambda d: {
-            "authorizations": [
-                {
-                    "id": a.get("id"),
-                    "person_id": a.get("personId"),
-                    "person_name": _person_names_by_id(d.persons).get(
-                        a.get("personId")
-                    ),
-                    "medium_id": (a.get("medium") or {}).get("id"),
-                    "medium_name": (a.get("medium") or {}).get("name")
-                    or (a.get("medium") or {}).get("mediumIdentifier"),
-                    "lock_id": (a.get("lock") or {}).get("id"),
-                    "lock_name": (a.get("lock") or {}).get("name"),
-                    "area_id": (a.get("area") or {}).get("id"),
-                    "area_name": (a.get("area") or {}).get("name"),
-                    "state": a.get("currentState"),
-                }
-                for a in d.authorizations
-            ]
-        },
+        attrs_fn=lambda d: {"authorizations": _expand_authorizations(d)},
     ),
     AirkeySensorEntityDescription(
         key="blacklist_entries",
