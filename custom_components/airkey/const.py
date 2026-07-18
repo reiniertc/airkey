@@ -24,6 +24,17 @@ DEFAULT_SCAN_INTERVAL_MINUTES: Final = 15
 MIN_SCAN_INTERVAL_MINUTES: Final = 5
 DEFAULT_EVENT_LOOKBACK_HOURS: Final = 24
 
+# How far back to look, per lock, when determining "last used" (lock-protocol
+# entries are fetched per lock via a filtered query, so this bound keeps that
+# query small and its result reliably complete rather than paging-truncated).
+LOCK_PROTOCOL_LOOKBACK_DAYS: Final = 30
+# LockProtocolEvent.type values that represent an actual successful unlock
+# (as opposed to sync/firmware/admin protocol entries for the same lock).
+SUCCESSFUL_UNLOCK_EVENT_TYPES: Final = {
+    "UNLOCKING_SUCCESSFUL",
+    "UNLOCKING_SUCCESSFUL_VIA_HANDS_FREE",
+}
+
 CONFIG_ENTRY_VERSION: Final = 2
 
 MANUFACTURER: Final = "EVVA"

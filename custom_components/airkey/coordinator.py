@@ -18,7 +18,9 @@ from .const import (
     DEFAULT_EVENT_LOOKBACK_HOURS,
     DEFAULT_SCAN_INTERVAL_MINUTES,
     DOMAIN,
+    LOCK_PROTOCOL_LOOKBACK_DAYS,
     MIN_SCAN_INTERVAL_MINUTES,
+    SUCCESSFUL_UNLOCK_EVENT_TYPES,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -48,6 +50,10 @@ class AirkeyData:
     pending_phone_replacements: list[dict] = field(default_factory=list)
     new_events: list[dict] = field(default_factory=list)
     latest_event: dict | None = None
+    # lock_id -> {"timestamp", "medium_id", "medium_name", "event_type"}
+    lock_last_used: dict[int, dict] = field(default_factory=dict)
+    # medium_id -> {"timestamp", "lock_id", "lock_name", "event_type"}
+    medium_last_used: dict[int, dict] = field(default_factory=dict)
 
 
 class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
@@ -111,6 +117,8 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
         if events:
             latest_event = max(events, key=lambda event: event.get("timestamp") or "")
 
+        lock_last_used, medium_last_used = await self._async_fetch_last_used(locks)
+
         return AirkeyData(
             customer=customer or {},
             settings=settings or {},
@@ -128,4 +136,73 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
             pending_phone_replacements=pending_replacements,
             new_events=events,
             latest_event=latest_event,
+            lock_last_used=lock_last_used,
+            medium_last_used=medium_last_used,
         )
+
+    async def _async_fetch_last_used(
+        self, locks: list[dict]
+    ) -> tuple[dict[int, dict], dict[int, dict]]:
+        """Determine the last successful unlock per lock (and, inverted, per medium).
+
+        Queried per lock (the lock-protocol-limit endpoint doesn't expose a lock
+        reference on unfiltered entries) and bounded to a recent window so the
+        result is complete rather than truncated by the pagination safety cap.
+        """
+        since = _iso(datetime.now(UTC) - timedelta(days=LOCK_PROTOCOL_LOOKBACK_DAYS))
+        lock_last_used: dict[int, dict] = {}
+
+        for lock in locks:
+            lock_id = lock.get("id")
+            if lock_id is None:
+                continue
+            try:
+                entries = await self.client.get_lock_protocol(
+                    **{"lockId": lock_id, "from": since}
+                )
+            except AirkeyRateLimitError:
+                _LOGGER.warning(
+                    "Airkey API rate limited while fetching lock-usage history; "
+                    "skipping remaining locks this cycle"
+                )
+                break
+            except AirkeyError as err:
+                _LOGGER.debug(
+                    "Could not fetch usage history for lock %s: %s", lock_id, err
+                )
+                continue
+
+            latest: dict | None = None
+            for entry in entries:
+                event_type = (entry.get("event") or {}).get("type")
+                if event_type not in SUCCESSFUL_UNLOCK_EVENT_TYPES:
+                    continue
+                if latest is None or (entry.get("timestamp") or "") > (
+                    latest.get("timestamp") or ""
+                ):
+                    latest = entry
+
+            if latest is not None:
+                medium = latest.get("medium") or {}
+                lock_last_used[lock_id] = {
+                    "timestamp": latest.get("timestamp"),
+                    "medium_id": medium.get("id"),
+                    "medium_name": medium.get("name") or medium.get("mediumIdentifier"),
+                    "event_type": (latest.get("event") or {}).get("type"),
+                }
+
+        lock_by_id = {lock.get("id"): lock for lock in locks}
+        medium_last_used: dict[int, dict] = {}
+        for lock_id, usage in lock_last_used.items():
+            medium_id = usage.get("medium_id")
+            if medium_id is None:
+                continue
+            door = lock_by_id.get(lock_id, {}).get("lockDoor") or {}
+            medium_last_used[medium_id] = {
+                "timestamp": usage["timestamp"],
+                "lock_id": lock_id,
+                "lock_name": door.get("name") or door.get("alternativeName"),
+                "event_type": usage.get("event_type"),
+            }
+
+        return lock_last_used, medium_last_used
