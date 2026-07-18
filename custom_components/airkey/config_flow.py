@@ -28,12 +28,15 @@ from .api import AirkeyApiClient, AirkeyAuthError, AirkeyError
 from .const import (
     CONF_ENVIRONMENT,
     CONF_EVENT_LOOKBACK_HOURS,
+    CONF_LOCK_DETAILS_INTERVAL_HOURS,
     CONFIG_ENTRY_VERSION,
     DEFAULT_EVENT_LOOKBACK_HOURS,
+    DEFAULT_LOCK_DETAILS_INTERVAL_HOURS,
     DEFAULT_SCAN_INTERVAL_MINUTES,
     DOMAIN,
     ENV_PRODUCTION,
     ENVIRONMENTS,
+    MIN_LOCK_DETAILS_INTERVAL_HOURS,
     MIN_SCAN_INTERVAL_MINUTES,
 )
 
@@ -114,6 +117,9 @@ class AirkeyConfigFlow(ConfigFlow, domain=DOMAIN):
                     options={
                         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL_MINUTES,
                         CONF_EVENT_LOOKBACK_HOURS: DEFAULT_EVENT_LOOKBACK_HOURS,
+                        CONF_LOCK_DETAILS_INTERVAL_HOURS: (
+                            DEFAULT_LOCK_DETAILS_INTERVAL_HOURS
+                        ),
                     },
                 )
 
@@ -195,6 +201,21 @@ class AirkeyOptionsFlow(OptionsFlow):
                 ): NumberSelector(
                     NumberSelectorConfig(
                         min=1,
+                        max=720,
+                        step=1,
+                        mode=NumberSelectorMode.BOX,
+                        unit_of_measurement="h",
+                    )
+                ),
+                vol.Required(
+                    CONF_LOCK_DETAILS_INTERVAL_HOURS,
+                    default=options.get(
+                        CONF_LOCK_DETAILS_INTERVAL_HOURS,
+                        DEFAULT_LOCK_DETAILS_INTERVAL_HOURS,
+                    ),
+                ): NumberSelector(
+                    NumberSelectorConfig(
+                        min=MIN_LOCK_DETAILS_INTERVAL_HOURS,
                         max=720,
                         step=1,
                         mode=NumberSelectorMode.BOX,

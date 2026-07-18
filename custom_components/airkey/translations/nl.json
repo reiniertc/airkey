@@ -41,7 +41,8 @@
         "title": "Airkey-opties",
         "data": {
           "scan_interval": "Ophaalinterval (minuten)",
-          "event_lookback_hours": "Terugkijkperiode voor gebeurtenissen bij eerste refresh (uren)"
+          "event_lookback_hours": "Terugkijkperiode voor gebeurtenissen bij eerste refresh (uren)",
+          "lock_details_interval_hours": "Ververinterval slotgebruik (uren)"
         }
       }
     }
@@ -148,6 +149,16 @@
         "config_entry_id": {
           "name": "Account",
           "description": "Het Airkey-account dat ververst moet worden."
+        }
+      }
+    },
+    "refresh_lock_details": {
+      "name": "Slotgebruik-details verversen",
+      "description": "Forceert een directe refresh van de \"laatst gebruikt\"- en gebied-koppeldata per slot, die normaal maar 1x per dag ververst om API-gebruik te beperken.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Het Airkey-account waarop deze actie wordt uitgevoerd."
         }
       }
     },

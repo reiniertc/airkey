@@ -9,6 +9,7 @@ DOMAIN: Final = "airkey"
 # Config / options keys
 CONF_ENVIRONMENT: Final = "environment"
 CONF_EVENT_LOOKBACK_HOURS: Final = "event_lookback_hours"
+CONF_LOCK_DETAILS_INTERVAL_HOURS: Final = "lock_details_interval_hours"
 
 ENV_PRODUCTION: Final = "production"
 ENV_TEST: Final = "test"
@@ -23,6 +24,14 @@ API_BASE_PATH: Final = "/cloud/v1"
 DEFAULT_SCAN_INTERVAL_MINUTES: Final = 15
 MIN_SCAN_INTERVAL_MINUTES: Final = 5
 DEFAULT_EVENT_LOOKBACK_HOURS: Final = 24
+
+# The per-lock "last used" and "assigned areas" lookups each cost one extra
+# API call per lock. Refreshing them on every coordinator cycle (default
+# every 15 minutes) can add up fast against the Airkey API's daily request
+# quota, so they're refreshed on their own, much longer interval instead -
+# use the refresh_lock_details service to force an immediate update.
+DEFAULT_LOCK_DETAILS_INTERVAL_HOURS: Final = 24
+MIN_LOCK_DETAILS_INTERVAL_HOURS: Final = 1
 
 # How far back to look, per lock, when determining "last used" (lock-protocol
 # entries are fetched per lock via a filtered query, so this bound keeps that
@@ -60,6 +69,7 @@ ISSUE_WRITE_ACCESS_DENIED: Final = "write_access_denied"
 
 # Services
 SERVICE_REFRESH: Final = "refresh"
+SERVICE_REFRESH_LOCK_DETAILS: Final = "refresh_lock_details"
 SERVICE_RESET_TEST_DATA: Final = "reset_test_data"
 
 SERVICE_CREATE_PERSON: Final = "create_person"

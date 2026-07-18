@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pytest
 from homeassistant.const import CONF_API_KEY
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
@@ -126,3 +127,36 @@ async def test_area_locks_index_built_from_per_lock_assignments(
     assert garden_locks == {1, 2}
     house_locks = {lock["id"] for lock in coordinator.data.area_locks[200]}
     assert house_locks == {2}
+
+
+@pytest.mark.parametrize("expected_lingering_timers", [True])
+async def test_lock_details_only_refreshed_once_per_interval(
+    hass, aioclient_mock
+) -> None:
+    """async_refresh_lock_details() goes through the coordinator's debounced
+    async_request_refresh(), which schedules a cooldown-reset timer that
+    outlives this test - expected_lingering_timers acknowledges that."""
+    lock = {"id": 1, "lockDoor": {"name": "Front door"}, "version": 1}
+    coordinator = await _make_coordinator(hass, aioclient_mock, locks=[lock])
+
+    def _protocol_call_count() -> int:
+        return len(
+            [
+                c
+                for c in aioclient_mock.mock_calls
+                if c[1].path.endswith("/lock-protocol-limit")
+            ]
+        )
+
+    await coordinator.async_refresh()
+    assert _protocol_call_count() == 1
+
+    # A second refresh well within the default 24h interval must not
+    # re-fetch the per-lock usage/area data.
+    await coordinator.async_refresh()
+    assert _protocol_call_count() == 1
+    assert coordinator.data.lock_last_used == {}
+
+    # But the manual "refresh lock details" service/method forces it.
+    await coordinator.async_refresh_lock_details()
+    assert _protocol_call_count() == 2

@@ -8,6 +8,16 @@ refresh:
         config_entry:
           integration: airkey
 
+refresh_lock_details:
+  name: Refresh lock usage details
+  description: Forces an immediate refresh of the per-lock "last used" and area-assignment data, which normally only refreshes once a day to limit API usage.
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: airkey
+
 reset_test_data:
   name: Reset test data
   description: Resets the predefined test data of the free Airkey integration/test environment. Has no effect on production accounts.
