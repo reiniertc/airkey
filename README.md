@@ -44,7 +44,9 @@ Afterwards, use the integration's **Configure** button to change the polling int
 
 ### API request budget
 
-The Airkey Cloud API enforces an (undocumented) daily request quota per account. The main polling cycle costs a fixed number of calls regardless of how many locks you have, but the per-lock "last used" and area-assignment lookups each cost one extra API call per lock, per refresh. To keep the daily total predictable regardless of scan interval, those two are refreshed on their own interval - **once a day by default** - instead of every polling cycle. Use the `airkey.refresh_lock_details` service (or lower the interval in **Configure**) if you want that data sooner than the next scheduled refresh.
+The Airkey Cloud API enforces an (undocumented) daily request quota per account. The main polling cycle costs a fixed number of calls regardless of how many locks you have, but the per-lock "last used" and area-assignment lookups each cost one extra API call per lock, per refresh. To keep the daily total predictable regardless of scan interval, those two are refreshed on their own interval - **once a day by default** - instead of every polling cycle. This once-a-day timestamp is persisted to disk, so a Home Assistant restart doesn't reset it and force an early re-fetch. Use the `airkey.refresh_lock_details` service (or lower the interval in **Configure**) if you want that data sooner than the next scheduled refresh.
+
+If you're still hitting the daily quota, the main polling cycle itself is the next thing to look at: it costs roughly 15 requests per cycle regardless of scan interval, so at the default 15-minute interval that's already ~1400 requests/day on its own. Raising the polling interval (e.g. to 30 or 60 minutes) in **Configure** cuts that proportionally.
 
 Multiple Airkey accounts (e.g. production and test) can be added side by side as separate config entries.
 

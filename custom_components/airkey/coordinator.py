@@ -10,6 +10,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import AirkeyApiClient, AirkeyAuthError, AirkeyError, AirkeyRateLimitError
@@ -27,6 +28,8 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+STORAGE_VERSION = 1
 
 
 def _iso(dt: datetime) -> str:
@@ -72,6 +75,10 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
         self._last_event_poll: str | None = None
         self._last_lock_details_poll: datetime | None = None
         self._force_lock_details_refresh = False
+        self._lock_details_store: Store[dict[str, str]] = Store(
+            hass, STORAGE_VERSION, f"{DOMAIN}_{entry.entry_id}_lock_details_poll"
+        )
+        self._lock_details_store_loaded = False
 
         scan_minutes = max(
             entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL_MINUTES),
@@ -93,7 +100,28 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
         self._force_lock_details_refresh = True
         await self.async_request_refresh()
 
+    async def _async_load_lock_details_poll(self) -> None:
+        """Load the persisted last-refresh timestamp, once.
+
+        Without this, a Home Assistant restart would reset the in-memory
+        timestamp and force an immediate re-fetch of the per-lock data on
+        the next cycle, defeating the point of the once-a-day interval.
+        """
+        if self._lock_details_store_loaded:
+            return
+        self._lock_details_store_loaded = True
+        stored = await self._lock_details_store.async_load()
+        if stored and stored.get("last_lock_details_poll"):
+            try:
+                self._last_lock_details_poll = datetime.fromisoformat(
+                    stored["last_lock_details_poll"]
+                )
+            except ValueError:
+                _LOGGER.debug("Ignoring malformed stored lock-details timestamp")
+
     async def _async_update_data(self) -> AirkeyData:
+        await self._async_load_lock_details_poll()
+
         if self._last_event_poll:
             created_after = self._last_event_poll
         else:
@@ -154,6 +182,9 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
             area_locks = await self._async_fetch_area_locks(locks)
             self._last_lock_details_poll = now
             self._force_lock_details_refresh = False
+            await self._lock_details_store.async_save(
+                {"last_lock_details_poll": now.isoformat()}
+            )
         else:
             lock_last_used = self.data.lock_last_used if self.data else {}
             medium_last_used = self.data.medium_last_used if self.data else {}
