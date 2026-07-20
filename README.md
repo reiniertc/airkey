@@ -48,6 +48,8 @@ The Airkey Cloud API enforces an (undocumented) daily request quota per account.
 
 If you're still hitting the daily quota, the main polling cycle itself is the next thing to look at: it costs roughly 15 requests per cycle regardless of scan interval, so at the default 15-minute interval that's already ~1400 requests/day on its own. Raising the polling interval (e.g. to 30 or 60 minutes) in **Configure** cuts that proportionally.
 
+When a refresh does fail (rate limited or otherwise), entities keep showing the last successfully fetched data instead of going unavailable - a single failed cycle (or a whole day of them, if you're rate limited until midnight UTC) won't blank out your dashboard.
+
 Multiple Airkey accounts (e.g. production and test) can be added side by side as separate config entries.
 
 ## Upgrading from 1.x
