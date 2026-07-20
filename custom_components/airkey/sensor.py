@@ -17,6 +17,7 @@ from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
+from homeassistant.util import dt as dt_util
 
 from . import AirkeyConfigEntry
 from .coordinator import AirkeyData, AirkeyDataUpdateCoordinator
@@ -31,6 +32,19 @@ def _person_name(person: dict) -> str:
 
 def _person_names_by_id(persons: list[dict]) -> dict[int, str]:
     return {p.get("id"): _person_name(p) for p in persons}
+
+
+def _medium_person_ids(d: AirkeyData) -> dict[int, int]:
+    """Map medium id -> the person it's assigned to.
+
+    LockProtocolEntry.medium (used for "last used") is a SimpleMedium and
+    doesn't carry personId directly, unlike the full Card/Phone records.
+    """
+    return {
+        m.get("id"): m.get("personId")
+        for m in (*d.cards, *d.phones)
+        if m.get("personId") is not None
+    }
 
 
 def _expand_authorizations(d: AirkeyData) -> list[dict]:
@@ -250,7 +264,11 @@ SENSOR_DESCRIPTIONS: tuple[AirkeySensorEntityDescription, ...] = (
         key="last_event",
         translation_key="last_event",
         device_class=SensorDeviceClass.TIMESTAMP,
-        value_fn=lambda d: d.latest_event.get("timestamp") if d.latest_event else None,
+        value_fn=lambda d: (
+            dt_util.parse_datetime(d.latest_event["timestamp"])
+            if d.latest_event and d.latest_event.get("timestamp")
+            else None
+        ),
         attrs_fn=lambda d: (
             {"details": d.latest_event.get("details")} if d.latest_event else {}
         ),
@@ -345,7 +363,9 @@ class AirkeyLockSensor(AirkeyLockEntity, SensorEntity):
         lock = self._get_lock() or {}
         door = lock.get("lockDoor") or {}
         firmware = lock.get("lockFirmware") or {}
-        last_used = self.coordinator.data.lock_last_used.get(self._lock_id, {})
+        data = self.coordinator.data
+        last_used = data.lock_last_used.get(self._lock_id, {})
+        last_used_person_id = _medium_person_ids(data).get(last_used.get("medium_id"))
         return {
             "lock_type": lock.get("lockType"),
             "lock_technology": lock.get("lockTechnology"),
@@ -362,4 +382,8 @@ class AirkeyLockSensor(AirkeyLockEntity, SensorEntity):
             "last_used_at": last_used.get("timestamp"),
             "last_used_by_medium_id": last_used.get("medium_id"),
             "last_used_by_medium_name": last_used.get("medium_name"),
+            "last_used_by_person_id": last_used_person_id,
+            "last_used_by_person_name": _person_names_by_id(data.persons).get(
+                last_used_person_id
+            ),
         }
