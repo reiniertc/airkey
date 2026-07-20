@@ -140,6 +140,7 @@ SENSOR_DESCRIPTIONS: tuple[AirkeySensorEntityDescription, ...] = (
                     "id": c.get("id"),
                     "name": c.get("name"),
                     "identifier": c.get("mediumIdentifier"),
+                    "activated": c.get("activated"),
                     "person_id": c.get("personId"),
                     "person_name": _person_names_by_id(d.persons).get(
                         c.get("personId")
@@ -166,6 +167,7 @@ SENSOR_DESCRIPTIONS: tuple[AirkeySensorEntityDescription, ...] = (
                     "id": p.get("id"),
                     "name": p.get("name"),
                     "identifier": p.get("mediumIdentifier"),
+                    "activated": p.get("activated"),
                     "person_id": p.get("personId"),
                     "person_name": _person_names_by_id(d.persons).get(
                         p.get("personId")

@@ -160,3 +160,34 @@ async def test_lock_details_only_refreshed_once_per_interval(
     # But the manual "refresh lock details" service/method forces it.
     await coordinator.async_refresh_lock_details()
     assert _protocol_call_count() == 2
+
+
+async def test_lock_details_poll_survives_coordinator_recreation(
+    hass, aioclient_mock
+) -> None:
+    """A Home Assistant restart recreates the coordinator from scratch; the
+    once-a-day gate must not reset just because of that."""
+    lock = {"id": 1, "lockDoor": {"name": "Front door"}, "version": 1}
+    register_empty_account(aioclient_mock, locks=[lock])
+    entry = await _create_entry(hass)
+    client = AirkeyApiClient(async_get_clientsession(hass), "key", ENV_PRODUCTION)
+
+    def _protocol_call_count() -> int:
+        return len(
+            [
+                c
+                for c in aioclient_mock.mock_calls
+                if c[1].path.endswith("/lock-protocol-limit")
+            ]
+        )
+
+    first_coordinator = AirkeyDataUpdateCoordinator(hass, entry, client)
+    await first_coordinator.async_refresh()
+    assert _protocol_call_count() == 1
+
+    # Simulate a restart: a brand-new coordinator instance for the same entry.
+    second_coordinator = AirkeyDataUpdateCoordinator(hass, entry, client)
+    await second_coordinator.async_refresh()
+
+    assert _protocol_call_count() == 1
+    assert second_coordinator._last_lock_details_poll is not None
