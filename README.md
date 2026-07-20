@@ -40,13 +40,13 @@ Configuration is done entirely through the UI (Settings → Devices & services �
    - **Production** — your real Airkey Cloud Interface account (`api.airkey.evva.com`). Requires the paid Cloud Interface activation; write access depends on your license.
    - **Test / integration (free)** — the free `integration.api.airkey.evva.com` environment with predefined test data. Read-only concerns don't apply here since the test environment supports the full API for free, but it never touches your real locks/persons.
 
-Afterwards, use the integration's **Configure** button to change the polling interval (default 15 minutes, minimum 5), the event lookback window used on the very first refresh (default 24 hours), and the lock usage refresh interval (default once a day - see below).
+Afterwards, use the integration's **Configure** button to change the polling interval (default 720 minutes / 12 hours, minimum 5), the event lookback window used on the very first refresh (default 24 hours), and the lock usage refresh interval (default once a day - see below).
 
 ### API request budget
 
 The Airkey Cloud API enforces an (undocumented) daily request quota per account. The main polling cycle costs a fixed number of calls regardless of how many locks you have, but the per-lock "last used" and area-assignment lookups each cost one extra API call per lock, per refresh. To keep the daily total predictable regardless of scan interval, those two are refreshed on their own interval - **once a day by default** - instead of every polling cycle. This once-a-day timestamp is persisted to disk, so a Home Assistant restart doesn't reset it and force an early re-fetch. Use the `airkey.refresh_lock_details` service (or lower the interval in **Configure**) if you want that data sooner than the next scheduled refresh.
 
-If you're still hitting the daily quota, the main polling cycle itself is the next thing to look at: it costs roughly 15 requests per cycle regardless of scan interval, so at the default 15-minute interval that's already ~1400 requests/day on its own. Raising the polling interval (e.g. to 30 or 60 minutes) in **Configure** cuts that proportionally.
+The main polling cycle itself costs roughly 15 requests per cycle regardless of scan interval, which is why the default polling interval is a conservative 720 minutes (12 hours, ~30 requests/day) rather than something more "real-time" like 15 minutes (~1400 requests/day). Lower it in **Configure** if your account's quota allows for more frequent updates; note that config entries created before this default changed keep whatever interval they already had, so existing installs need to update it manually if they want the new, more conservative default too.
 
 When a refresh does fail (rate limited or otherwise), entities keep showing the last successfully fetched data instead of going unavailable - a single failed cycle (or a whole day of them, if you're rate limited until midnight UTC) won't blank out your dashboard.
 
