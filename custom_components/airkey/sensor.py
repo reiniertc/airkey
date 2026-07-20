@@ -17,6 +17,7 @@ from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
+from homeassistant.util import dt as dt_util
 
 from . import AirkeyConfigEntry
 from .coordinator import AirkeyData, AirkeyDataUpdateCoordinator
@@ -250,7 +251,11 @@ SENSOR_DESCRIPTIONS: tuple[AirkeySensorEntityDescription, ...] = (
         key="last_event",
         translation_key="last_event",
         device_class=SensorDeviceClass.TIMESTAMP,
-        value_fn=lambda d: d.latest_event.get("timestamp") if d.latest_event else None,
+        value_fn=lambda d: (
+            dt_util.parse_datetime(d.latest_event["timestamp"])
+            if d.latest_event and d.latest_event.get("timestamp")
+            else None
+        ),
         attrs_fn=lambda d: (
             {"details": d.latest_event.get("details")} if d.latest_event else {}
         ),
