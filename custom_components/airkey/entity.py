@@ -21,6 +21,13 @@ class AirkeyEntity(CoordinatorEntity[AirkeyDataUpdateCoordinator]):
         self._attr_translation_key = key
 
     @property
+    def available(self) -> bool:
+        # Keep showing the last known good data through a transient API failure
+        # (e.g. hitting Airkey's daily rate limit) instead of going unavailable -
+        # only actually unavailable before the very first successful refresh.
+        return self.coordinator.data is not None
+
+    @property
     def device_info(self) -> DeviceInfo:
         # Fixed device name (rather than the account's own accessControlSystemName) so
         # generated entity_ids are stable, e.g. sensor.airkey_persons. The account name
@@ -58,7 +65,9 @@ class AirkeyLockEntity(CoordinatorEntity[AirkeyDataUpdateCoordinator]):
 
     @property
     def available(self) -> bool:
-        return super().available and self._get_lock() is not None
+        # See AirkeyEntity.available - keep showing last known good data through
+        # a transient API failure instead of going unavailable.
+        return self.coordinator.data is not None and self._get_lock() is not None
 
     @property
     def device_info(self) -> DeviceInfo:
