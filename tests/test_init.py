@@ -71,6 +71,61 @@ async def test_entities_stay_available_after_failed_refresh(
     assert credits_state.state == "100"
 
 
+async def test_lock_sensor_resolves_last_used_person(hass, aioclient_mock) -> None:
+    lock = {"id": 1, "lockDoor": {"name": "Front door"}, "version": 1}
+
+    aioclient_mock.get(
+        f"{API_BASE}/persons",
+        json={
+            "offset": 0,
+            "total": 1,
+            "personList": [{"id": 10, "firstName": "Jane", "lastName": "Doe"}],
+        },
+    )
+    aioclient_mock.get(
+        f"{API_BASE}/media/cards",
+        json={
+            "offset": 0,
+            "total": 1,
+            "mediumList": [{"id": 5, "name": "Jane's card", "personId": 10}],
+        },
+    )
+    aioclient_mock.get(
+        f"{API_BASE}/lock-protocol-limit",
+        params={"lockId": "1"},
+        json={
+            "offset": 0,
+            "total": 1,
+            "lockProtocols": [
+                {
+                    "event": {"type": "UNLOCKING_SUCCESSFUL"},
+                    "medium": {"id": 5, "name": "Jane's card"},
+                    "timestamp": "2026-07-01T10:00:00.000Z",
+                }
+            ],
+        },
+    )
+
+    register_empty_account(aioclient_mock, locks=[lock])
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={CONF_API_KEY: "key", CONF_ENVIRONMENT: ENV_PRODUCTION},
+        options={CONF_SCAN_INTERVAL: 15, "event_lookback_hours": 24},
+        unique_id="production:CUST-1",
+        version=CONFIG_ENTRY_VERSION,
+    )
+    entry.add_to_hass(hass)
+
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    state = hass.states.get("sensor.airkey_front_door_lock")
+    assert state is not None
+    assert state.attributes["last_used_by_medium_name"] == "Jane's card"
+    assert state.attributes["last_used_by_person_id"] == 10
+    assert state.attributes["last_used_by_person_name"] == "Jane Doe"
+
+
 async def test_migration_from_v1(hass, aioclient_mock) -> None:
     register_empty_account(aioclient_mock)
     entry = MockConfigEntry(

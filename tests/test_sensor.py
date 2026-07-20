@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from custom_components.airkey.coordinator import AirkeyData
-from custom_components.airkey.sensor import _expand_authorizations
+from custom_components.airkey.sensor import _expand_authorizations, _medium_person_ids
 
 
 def test_expand_authorizations_keeps_direct_lock_authorizations() -> None:
@@ -75,3 +75,14 @@ def test_expand_authorizations_keeps_area_only_row_when_locks_unknown() -> None:
     assert len(rows) == 1
     assert rows[0]["lock_id"] is None
     assert rows[0]["area_name"] == "Unknown area"
+
+
+def test_medium_person_ids_covers_cards_and_phones() -> None:
+    data = AirkeyData(
+        cards=[{"id": 5, "personId": 10}, {"id": 6, "personId": None}],
+        phones=[{"id": 7, "personId": 11}],
+    )
+
+    result = _medium_person_ids(data)
+
+    assert result == {5: 10, 7: 11}
