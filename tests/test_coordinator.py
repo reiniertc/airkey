@@ -4,10 +4,16 @@ from __future__ import annotations
 
 import pytest
 from homeassistant.const import CONF_API_KEY
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from custom_components.airkey.api import AirkeyApiClient
-from custom_components.airkey.const import CONF_ENVIRONMENT, DOMAIN, ENV_PRODUCTION
+from custom_components.airkey.const import (
+    CONF_ENVIRONMENT,
+    DOMAIN,
+    ENV_PRODUCTION,
+    ISSUE_LOCK_DETAILS_ACCESS_DENIED,
+)
 from custom_components.airkey.coordinator import AirkeyDataUpdateCoordinator
 
 from .conftest import API_BASE, register_empty_account
@@ -249,3 +255,24 @@ async def test_lock_details_poll_survives_coordinator_recreation(
 
     assert _protocol_call_count() == 1
     assert second_coordinator._last_lock_details_poll is not None
+
+
+async def test_forbidden_lock_protocol_creates_repair_issue(
+    hass, aioclient_mock
+) -> None:
+    """A 403 on a *read* endpoint means the account's plan doesn't include
+    it - surface a repair issue instead of just failing silently."""
+    lock = {"id": 1, "lockDoor": {"name": "Front door"}, "version": 1}
+    aioclient_mock.get(
+        f"{API_BASE}/lock-protocol-limit", params={"lockId": "1"}, status=403
+    )
+    coordinator = await _make_coordinator(hass, aioclient_mock, locks=[lock])
+
+    await coordinator.async_refresh()
+
+    assert coordinator.last_update_success
+    assert coordinator.data.lock_last_used == {}
+    issue = ir.async_get(hass).async_get_issue(
+        DOMAIN, f"{ISSUE_LOCK_DETAILS_ACCESS_DENIED}_{coordinator.entry.entry_id}"
+    )
+    assert issue is not None
