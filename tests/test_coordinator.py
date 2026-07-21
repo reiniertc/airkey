@@ -104,6 +104,64 @@ async def test_lock_last_used_from_protocol(hass, aioclient_mock) -> None:
     assert medium_usage["lock_id"] == 1
     assert medium_usage["lock_name"] == "Front door"
 
+    # Medium 42 unlocked this same lock earlier and isn't the lock's most
+    # recent unlocker anymore, but it must still keep its own last-used entry
+    # rather than disappearing from medium_last_used entirely.
+    other_medium_usage = coordinator.data.medium_last_used[42]
+    assert other_medium_usage["timestamp"] == "2026-07-01T10:00:00.000Z"
+    assert other_medium_usage["lock_id"] == 1
+    assert other_medium_usage["lock_name"] == "Front door"
+
+
+async def test_medium_last_used_tracks_most_recent_lock_across_multiple_locks(
+    hass, aioclient_mock
+) -> None:
+    """A medium that unlocks two different locks must report the most recent
+    of the two, not whichever lock happens to be processed last."""
+    front_door = {"id": 1, "lockDoor": {"name": "Front door"}, "version": 1}
+    back_door = {"id": 2, "lockDoor": {"name": "Back door"}, "version": 1}
+    aioclient_mock.get(
+        f"{API_BASE}/lock-protocol-limit",
+        params={"lockId": "1"},
+        json={
+            "offset": 0,
+            "total": 1,
+            "lockProtocols": [
+                {
+                    "event": {"type": "UNLOCKING_SUCCESSFUL"},
+                    "medium": {"id": 7, "name": "John's phone"},
+                    "timestamp": "2026-07-01T08:00:00.000Z",
+                }
+            ],
+        },
+    )
+    aioclient_mock.get(
+        f"{API_BASE}/lock-protocol-limit",
+        params={"lockId": "2"},
+        json={
+            "offset": 0,
+            "total": 1,
+            "lockProtocols": [
+                {
+                    "event": {"type": "UNLOCKING_SUCCESSFUL"},
+                    "medium": {"id": 7, "name": "John's phone"},
+                    "timestamp": "2026-07-05T09:00:00.000Z",
+                }
+            ],
+        },
+    )
+    coordinator = await _make_coordinator(
+        hass, aioclient_mock, locks=[front_door, back_door]
+    )
+
+    await coordinator.async_refresh()
+
+    assert coordinator.last_update_success
+    medium_usage = coordinator.data.medium_last_used[7]
+    assert medium_usage["timestamp"] == "2026-07-05T09:00:00.000Z"
+    assert medium_usage["lock_id"] == 2
+    assert medium_usage["lock_name"] == "Back door"
+
 
 async def test_area_locks_index_built_from_per_lock_assignments(
     hass, aioclient_mock
