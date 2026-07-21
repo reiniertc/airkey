@@ -139,6 +139,10 @@
     "write_access_denied": {
       "title": "Airkey API key has no write access",
       "description": "The Airkey API key for {title} rejected a write request (HTTP 403). Free/read-only Airkey contracts can only be used for monitoring; creating, updating or deleting data requires a production API key with write access. Upgrade your Airkey Cloud Interface license or use a key that has been granted write permissions."
+    },
+    "lock_details_access_denied": {
+      "title": "Airkey API key can't read lock usage details",
+      "description": "The Airkey API key for {title} was rejected (HTTP 403) when reading lock usage history or area assignments. These are read (GET) endpoints, so a 403 here means your Airkey Cloud Interface plan doesn't include them - the \"last used\" attributes on lock/card/phone sensors and the area-to-lock expansion on authorizations will stay empty. Contact EVVA if you believe your plan should include this data."
     }
   },
   "services": {

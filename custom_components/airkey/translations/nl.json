@@ -139,6 +139,10 @@
     "write_access_denied": {
       "title": "Airkey API-sleutel heeft geen schrijftoegang",
       "description": "De Airkey API-sleutel voor {title} heeft een schrijfverzoek geweigerd (HTTP 403). Gratis/alleen-lezen Airkey-contracten kunnen alleen worden gebruikt om te monitoren; het aanmaken, bijwerken of verwijderen van data vereist een productie-API-sleutel met schrijftoegang. Upgrade je Airkey Cloud Interface-licentie of gebruik een sleutel die schrijfrechten heeft gekregen."
+    },
+    "lock_details_access_denied": {
+      "title": "Airkey API-sleutel kan geen slotgebruikdetails lezen",
+      "description": "De Airkey API-sleutel voor {title} werd geweigerd (HTTP 403) bij het lezen van slotgebruikgeschiedenis of gebied-koppelingen. Dit zijn leesverzoeken (GET), dus een 403 hier betekent dat je Airkey Cloud Interface-abonnement deze niet bevat - de \"laatst gebruikt\"-attributen op slot-/kaart-/telefoonsensoren en de gebied-naar-slot-uitbreiding op autorisaties blijven dan leeg. Neem contact op met EVVA als je denkt dat je abonnement deze data zou moeten bevatten."
     }
   },
   "services": {

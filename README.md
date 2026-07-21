@@ -50,6 +50,8 @@ The main polling cycle itself costs roughly 15 requests per cycle regardless of 
 
 When a refresh does fail (rate limited or otherwise), entities keep showing the last successfully fetched data instead of going unavailable - a single failed cycle (or a whole day of them, if you're rate limited until midnight UTC) won't blank out your dashboard.
 
+If the lock/card/phone `last_used_*` attributes stay empty even after a forced `airkey.refresh_lock_details`, check **Settings → System → Repairs**: some Airkey plans don't include the `lock-protocol-limit`/assigned-areas endpoints even though they're read-only GET requests, and a 403 there creates a repair issue explaining that instead of failing silently.
+
 Multiple Airkey accounts (e.g. production and test) can be added side by side as separate config entries.
 
 ## Upgrading from 1.x

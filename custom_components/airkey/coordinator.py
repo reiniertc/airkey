@@ -10,10 +10,17 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .api import AirkeyApiClient, AirkeyAuthError, AirkeyError, AirkeyRateLimitError
+from .api import (
+    AirkeyApiClient,
+    AirkeyAuthError,
+    AirkeyError,
+    AirkeyForbiddenError,
+    AirkeyRateLimitError,
+)
 from .const import (
     CONF_EVENT_LOOKBACK_HOURS,
     CONF_LOCK_DETAILS_INTERVAL_HOURS,
@@ -21,6 +28,7 @@ from .const import (
     DEFAULT_LOCK_DETAILS_INTERVAL_HOURS,
     DEFAULT_SCAN_INTERVAL_MINUTES,
     DOMAIN,
+    ISSUE_LOCK_DETAILS_ACCESS_DENIED,
     LOCK_PROTOCOL_LOOKBACK_DAYS,
     MIN_LOCK_DETAILS_INTERVAL_HOURS,
     MIN_SCAN_INTERVAL_MINUTES,
@@ -89,6 +97,21 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
             _LOGGER,
             name=DOMAIN,
             update_interval=timedelta(minutes=scan_minutes),
+        )
+
+    def _async_create_lock_details_access_issue(self) -> None:
+        """Surface a repair issue once per entry when the lock-details GET
+        endpoints return 403, instead of leaving users to dig through logs
+        to find out why last_used_* stays empty."""
+        ir.async_create_issue(
+            self.hass,
+            DOMAIN,
+            f"{ISSUE_LOCK_DETAILS_ACCESS_DENIED}_{self.entry.entry_id}",
+            is_fixable=False,
+            is_persistent=True,
+            severity=ir.IssueSeverity.WARNING,
+            translation_key=ISSUE_LOCK_DETAILS_ACCESS_DENIED,
+            translation_placeholders={"title": self.entry.title},
         )
 
     async def async_refresh_lock_details(self) -> None:
@@ -245,8 +268,19 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
                     "skipping remaining locks this cycle"
                 )
                 break
+            except AirkeyForbiddenError:
+                _LOGGER.warning(
+                    "Airkey API key is not permitted to read the usage history "
+                    "(lock-protocol-limit) for lock %s. This is a GET request, so "
+                    "a 403 here means your Airkey Cloud Interface plan doesn't "
+                    "include this endpoint - the lock's last_used_* attributes "
+                    "will stay empty regardless of scan interval",
+                    lock_id,
+                )
+                self._async_create_lock_details_access_issue()
+                continue
             except AirkeyError as err:
-                _LOGGER.debug(
+                _LOGGER.warning(
                     "Could not fetch usage history for lock %s: %s", lock_id, err
                 )
                 continue
@@ -315,8 +349,17 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
                     "skipping remaining locks this cycle"
                 )
                 break
+            except AirkeyForbiddenError:
+                _LOGGER.warning(
+                    "Airkey API key is not permitted to read assigned areas for "
+                    "lock %s. This is a GET request, so a 403 here means your "
+                    "Airkey Cloud Interface plan doesn't include this endpoint",
+                    lock_id,
+                )
+                self._async_create_lock_details_access_issue()
+                continue
             except AirkeyError as err:
-                _LOGGER.debug(
+                _LOGGER.warning(
                     "Could not fetch assigned areas for lock %s: %s", lock_id, err
                 )
                 continue

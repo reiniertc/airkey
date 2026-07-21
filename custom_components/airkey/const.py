@@ -66,6 +66,7 @@ API_EVENT_TYPE_MAP: Final = {
 
 # Repair issue ids
 ISSUE_WRITE_ACCESS_DENIED: Final = "write_access_denied"
+ISSUE_LOCK_DETAILS_ACCESS_DENIED: Final = "lock_details_access_denied"
 
 # Services
 SERVICE_REFRESH: Final = "refresh"
