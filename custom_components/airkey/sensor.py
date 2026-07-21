@@ -47,6 +47,24 @@ def _medium_person_ids(d: AirkeyData) -> dict[int, int]:
     }
 
 
+def _lock_names_by_id(d: AirkeyData) -> dict[int, str]:
+    names: dict[int, str] = {}
+    for lock in d.locks:
+        door = lock.get("lockDoor") or {}
+        lock_id = lock.get("id")
+        names[lock_id] = (
+            door.get("name") or door.get("alternativeName") or f"Lock {lock_id}"
+        )
+    return names
+
+
+def _medium_names_by_id(d: AirkeyData) -> dict[int, str]:
+    return {
+        m.get("id"): m.get("name") or m.get("mediumIdentifier")
+        for m in (*d.cards, *d.phones)
+    }
+
+
 def _expand_authorizations(d: AirkeyData) -> list[dict]:
     """Flatten authorizations to one row per (person, lock, medium).
 
@@ -56,14 +74,20 @@ def _expand_authorizations(d: AirkeyData) -> list[dict]:
     the individual locks that live in it.
     """
     person_names = _person_names_by_id(d.persons)
+    lock_names = _lock_names_by_id(d)
+    medium_names = _medium_names_by_id(d)
     rows: list[dict] = []
     for a in d.authorizations:
+        medium_id = (a.get("medium") or {}).get("id")
         base = {
             "id": a.get("id"),
             "person_id": a.get("personId"),
             "person_name": person_names.get(a.get("personId")),
-            "medium_id": (a.get("medium") or {}).get("id"),
-            "medium_name": (a.get("medium") or {}).get("name")
+            "medium_id": medium_id,
+            # Prefer the full Card/Phone record's name - the authorization's
+            # own embedded medium/lock objects aren't reliably populated.
+            "medium_name": medium_names.get(medium_id)
+            or (a.get("medium") or {}).get("name")
             or (a.get("medium") or {}).get("mediumIdentifier"),
             "state": a.get("currentState"),
         }
@@ -72,11 +96,12 @@ def _expand_authorizations(d: AirkeyData) -> list[dict]:
         area_id = area.get("id")
 
         if lock.get("id") is not None:
+            lock_id = lock.get("id")
             rows.append(
                 {
                     **base,
-                    "lock_id": lock.get("id"),
-                    "lock_name": lock.get("name"),
+                    "lock_id": lock_id,
+                    "lock_name": lock_names.get(lock_id) or lock.get("name"),
                     "area_id": area_id,
                     "area_name": area.get("name"),
                 }

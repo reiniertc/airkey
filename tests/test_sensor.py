@@ -77,6 +77,34 @@ def test_expand_authorizations_keeps_area_only_row_when_locks_unknown() -> None:
     assert rows[0]["area_name"] == "Unknown area"
 
 
+def test_expand_authorizations_prefers_full_lock_and_medium_records() -> None:
+    """The authorization's own embedded lock/medium name isn't reliably
+    populated by the API - the full Lock/Card/Phone records (from the
+    regular /locks and /media/* fetches) must win when available."""
+    data = AirkeyData(
+        persons=[{"id": 1, "firstName": "Jane", "lastName": "Doe"}],
+        locks=[{"id": 1, "lockDoor": {"name": "Kitchen door"}}],
+        cards=[{"id": 5, "name": "Card A", "mediumIdentifier": "0005B650"}],
+        authorizations=[
+            {
+                "id": 10,
+                "personId": 1,
+                # Embedded lock/medium objects with no name, as returned by
+                # the API in practice.
+                "medium": {"id": 5, "name": None},
+                "lock": {"id": 1, "name": None},
+                "currentState": "UNCHANGED",
+            }
+        ],
+    )
+
+    rows = _expand_authorizations(data)
+
+    assert len(rows) == 1
+    assert rows[0]["lock_name"] == "Kitchen door"
+    assert rows[0]["medium_name"] == "Card A"
+
+
 def test_medium_person_ids_covers_cards_and_phones() -> None:
     data = AirkeyData(
         cards=[{"id": 5, "personId": 10}, {"id": 6, "personId": None}],
