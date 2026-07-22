@@ -147,6 +147,30 @@ def test_lock_details_last_refreshed_sensor_reads_timestamp() -> None:
     assert _description("lock_details_last_refreshed").value_fn(data) == now
 
 
+def test_maintenance_tasks_sensor_exposes_task_types_and_lock_name() -> None:
+    data = AirkeyData(
+        locks=[{"id": 1, "lockDoor": {"name": "Front door"}}],
+        maintenance_tasks=[
+            {
+                "lock": {"id": 1, "name": None},
+                "maintenanceTaskList": ["EMPTY_BATTERY", "CLOCK_INVALID"],
+            }
+        ],
+    )
+    description = _description("maintenance_tasks")
+
+    assert description.value_fn(data) == 1
+    assert description.attrs_fn(data) == {
+        "tasks": [
+            {
+                "lock_id": 1,
+                "lock_name": "Front door",
+                "types": ["EMPTY_BATTERY", "CLOCK_INVALID"],
+            }
+        ]
+    }
+
+
 def test_medium_person_ids_covers_cards_and_phones() -> None:
     data = AirkeyData(
         cards=[{"id": 5, "personId": 10}, {"id": 6, "personId": None}],
