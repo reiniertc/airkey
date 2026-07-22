@@ -50,6 +50,19 @@ async def test_first_refresh_populates_data(hass, aioclient_mock) -> None:
     assert coordinator.data.locks == []
 
 
+async def test_data_includes_request_count_and_refresh_timestamps(
+    hass, aioclient_mock
+) -> None:
+    coordinator = await _make_coordinator(hass, aioclient_mock)
+
+    await coordinator.async_refresh()
+
+    assert coordinator.data.request_count_today > 0
+    assert coordinator.data.request_count_limit == 250
+    assert coordinator.data.main_data_last_refreshed is not None
+    assert coordinator.data.lock_details_last_refreshed is not None
+
+
 async def test_second_refresh_uses_last_poll_as_created_after(
     hass, aioclient_mock
 ) -> None:
@@ -255,6 +268,37 @@ async def test_lock_details_poll_survives_coordinator_recreation(
 
     assert _protocol_call_count() == 1
     assert second_coordinator._last_lock_details_poll is not None
+
+
+async def test_request_count_persists_across_coordinator_recreation(
+    hass, aioclient_mock
+) -> None:
+    """A Home Assistant restart creates a brand-new API client (whose own
+    counter starts at 0) and a brand-new coordinator; the coordinator must
+    reseed the new client's counter from the persisted state so the daily
+    count doesn't appear to reset just because HA restarted."""
+    register_empty_account(aioclient_mock)
+    entry = await _create_entry(hass)
+
+    first_client = AirkeyApiClient(async_get_clientsession(hass), "key", ENV_PRODUCTION)
+    first_coordinator = AirkeyDataUpdateCoordinator(hass, entry, first_client)
+    await first_coordinator.async_refresh()
+    count_after_first = first_client.request_count_today
+    assert count_after_first > 0
+
+    # Simulate a restart: fresh client (its own counter starts at 0).
+    second_client = AirkeyApiClient(
+        async_get_clientsession(hass), "key", ENV_PRODUCTION
+    )
+    assert second_client.request_count_today == 0
+
+    second_coordinator = AirkeyDataUpdateCoordinator(hass, entry, second_client)
+    await second_coordinator.async_refresh()
+
+    # The persisted count from before the "restart" plus this cycle's own
+    # requests, not just this cycle's requests in isolation.
+    assert second_client.request_count_today == 2 * count_after_first
+    assert second_coordinator.data.request_count_today == 2 * count_after_first
 
 
 async def test_forbidden_lock_protocol_creates_repair_issue(

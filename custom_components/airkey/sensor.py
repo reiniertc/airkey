@@ -310,6 +310,39 @@ SENSOR_DESCRIPTIONS: tuple[AirkeySensorEntityDescription, ...] = (
             "four_eyes_enabled": d.settings.get("fourEyesEnabled"),
         },
     ),
+    AirkeySensorEntityDescription(
+        key="api_requests_today",
+        translation_key="api_requests_today",
+        native_unit_of_measurement="requests",
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda d: d.request_count_today,
+        attrs_fn=lambda d: {
+            "limit": d.request_count_limit,
+            "remaining": max(d.request_count_limit - d.request_count_today, 0),
+        },
+    ),
+    AirkeySensorEntityDescription(
+        key="main_data_last_refreshed",
+        translation_key="main_data_last_refreshed",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda d: d.main_data_last_refreshed,
+    ),
+    AirkeySensorEntityDescription(
+        key="lock_details_last_refreshed",
+        translation_key="lock_details_last_refreshed",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda d: d.lock_details_last_refreshed,
+        attrs_fn=lambda d: {
+            "note": (
+                "Only refreshed on its own interval (lock_details_interval_hours"
+                " option), not every scan - use the refresh_lock_details service"
+                " to force an immediate update."
+            )
+        },
+    ),
 )
 
 

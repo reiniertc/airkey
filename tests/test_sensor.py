@@ -2,8 +2,14 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
+
 from custom_components.airkey.coordinator import AirkeyData
-from custom_components.airkey.sensor import _expand_authorizations, _medium_person_ids
+from custom_components.airkey.sensor import (
+    SENSOR_DESCRIPTIONS,
+    _expand_authorizations,
+    _medium_person_ids,
+)
 
 
 def test_expand_authorizations_keeps_direct_lock_authorizations() -> None:
@@ -103,6 +109,42 @@ def test_expand_authorizations_prefers_full_lock_and_medium_records() -> None:
     assert len(rows) == 1
     assert rows[0]["lock_name"] == "Kitchen door"
     assert rows[0]["medium_name"] == "Card A"
+
+
+def _description(key: str):
+    return next(d for d in SENSOR_DESCRIPTIONS if d.key == key)
+
+
+def test_api_requests_today_sensor_reports_limit_and_remaining() -> None:
+    data = AirkeyData(request_count_today=40, request_count_limit=250)
+    description = _description("api_requests_today")
+
+    assert description.value_fn(data) == 40
+    assert description.attrs_fn(data) == {"limit": 250, "remaining": 210}
+
+
+def test_api_requests_today_sensor_clamps_remaining_at_zero() -> None:
+    """If the count somehow exceeds the configured limit (e.g. the limit was
+    lowered after requests were already made today), remaining must not go
+    negative."""
+    data = AirkeyData(request_count_today=260, request_count_limit=250)
+    description = _description("api_requests_today")
+
+    assert description.attrs_fn(data) == {"limit": 250, "remaining": 0}
+
+
+def test_main_data_last_refreshed_sensor_reads_timestamp() -> None:
+    now = datetime.now(UTC)
+    data = AirkeyData(main_data_last_refreshed=now)
+
+    assert _description("main_data_last_refreshed").value_fn(data) == now
+
+
+def test_lock_details_last_refreshed_sensor_reads_timestamp() -> None:
+    now = datetime.now(UTC)
+    data = AirkeyData(lock_details_last_refreshed=now)
+
+    assert _description("lock_details_last_refreshed").value_fn(data) == now
 
 
 def test_medium_person_ids_covers_cards_and_phones() -> None:

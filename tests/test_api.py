@@ -82,3 +82,59 @@ async def test_test_environment_uses_integration_host(hass, aioclient_mock) -> N
     customer = await client.get_customer()
 
     assert customer["customerNumber"] == "TEST-1"
+
+
+async def test_request_count_increments_per_call(hass, aioclient_mock) -> None:
+    aioclient_mock.get(f"{BASE}/customer", json={"customerNumber": "1"})
+    client = AirkeyApiClient(async_get_clientsession(hass), "key", "production")
+
+    assert client.request_count_today == 0
+
+    await client.get_customer()
+    await client.get_customer()
+
+    assert client.request_count_today == 2
+    assert client.request_count_date == client._today()
+
+
+async def test_request_count_counts_failed_requests_too(hass, aioclient_mock) -> None:
+    aioclient_mock.get(f"{BASE}/customer", status=401)
+    client = AirkeyApiClient(async_get_clientsession(hass), "bad-key", "production")
+
+    with pytest.raises(AirkeyAuthError):
+        await client.get_customer()
+
+    assert client.request_count_today == 1
+
+
+async def test_request_count_resets_on_new_day(hass, aioclient_mock) -> None:
+    aioclient_mock.get(f"{BASE}/customer", json={"customerNumber": "1"})
+    client = AirkeyApiClient(async_get_clientsession(hass), "key", "production")
+
+    await client.get_customer()
+    assert client.request_count_today == 1
+
+    # Simulate the UTC date rolling over without a restart.
+    client._request_count_date = "2000-01-01"
+
+    assert client.request_count_today == 0
+
+    await client.get_customer()
+    assert client.request_count_today == 1
+    assert client.request_count_date != "2000-01-01"
+
+
+def test_seed_request_count_restores_todays_count() -> None:
+    client = AirkeyApiClient(None, "key", "production")
+
+    client.seed_request_count(42, client._today())
+
+    assert client.request_count_today == 42
+
+
+def test_seed_request_count_ignores_stale_date() -> None:
+    client = AirkeyApiClient(None, "key", "production")
+
+    client.seed_request_count(42, "2000-01-01")
+
+    assert client.request_count_today == 0

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import logging
+from datetime import UTC, datetime
 from typing import Any
 
 import aiohttp
@@ -64,6 +65,47 @@ class AirkeyApiClient:
         self._api_key = api_key
         self._environment = environment
         self._host = HOST_BY_ENVIRONMENT[environment]
+        self._request_count = 0
+        self._request_count_date: str | None = None
+
+    # -- request accounting ----------------------------------------------
+    #
+    # The Airkey Cloud API enforces an undocumented daily request quota
+    # (reported by EVVA support as 250/day, resetting at midnight UTC). This
+    # is a local, best-effort count of requests *this client instance* has
+    # made today - it can't see requests from elsewhere (another app, a
+    # second HA instance) and resets to 0 on process start unless seeded via
+    # seed_request_count(), but it's the closest self-monitoring available
+    # since Airkey exposes no "requests remaining" endpoint.
+
+    @staticmethod
+    def _today() -> str:
+        return datetime.now(UTC).strftime("%Y-%m-%d")
+
+    def _note_request(self) -> None:
+        today = self._today()
+        if self._request_count_date != today:
+            self._request_count_date = today
+            self._request_count = 0
+        self._request_count += 1
+
+    @property
+    def request_count_today(self) -> int:
+        """Number of requests made today (UTC), 0 if none yet today."""
+        if self._request_count_date != self._today():
+            return 0
+        return self._request_count
+
+    @property
+    def request_count_date(self) -> str:
+        """The UTC date (YYYY-MM-DD) request_count_today applies to."""
+        return self._today()
+
+    def seed_request_count(self, count: int, date: str) -> None:
+        """Restore a persisted count, e.g. after a Home Assistant restart."""
+        if date == self._today():
+            self._request_count = count
+            self._request_count_date = date
 
     # -- low level -----------------------------------------------------
 
@@ -75,6 +117,7 @@ class AirkeyApiClient:
         params: dict[str, Any] | None = None,
         json_body: Any = None,
     ) -> Any:
+        self._note_request()
         url = f"https://{self._host}{API_BASE_PATH}{path}"
         headers = {"X-API-Key": self._api_key, "Accept": "application/json"}
         clean_params = (

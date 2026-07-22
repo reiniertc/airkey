@@ -22,8 +22,10 @@ from .api import (
     AirkeyRateLimitError,
 )
 from .const import (
+    CONF_DAILY_REQUEST_LIMIT,
     CONF_EVENT_LOOKBACK_HOURS,
     CONF_LOCK_DETAILS_INTERVAL_HOURS,
+    DEFAULT_DAILY_REQUEST_LIMIT,
     DEFAULT_EVENT_LOOKBACK_HOURS,
     DEFAULT_LOCK_DETAILS_INTERVAL_HOURS,
     DEFAULT_SCAN_INTERVAL_MINUTES,
@@ -70,6 +72,10 @@ class AirkeyData:
     medium_last_used: dict[int, dict] = field(default_factory=dict)
     # area_id -> [{"id": lock_id, "name": lock_name}, ...]
     area_locks: dict[int, list[dict]] = field(default_factory=dict)
+    lock_details_last_refreshed: datetime | None = None
+    main_data_last_refreshed: datetime | None = None
+    request_count_today: int = 0
+    request_count_limit: int = DEFAULT_DAILY_REQUEST_LIMIT
 
 
 class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
@@ -83,10 +89,13 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
         self._last_event_poll: str | None = None
         self._last_lock_details_poll: datetime | None = None
         self._force_lock_details_refresh = False
-        self._lock_details_store: Store[dict[str, str]] = Store(
+        # Persists the lock-details poll timestamp and the daily request
+        # count across Home Assistant restarts (see the two load/save
+        # helpers below for why each of those needs to survive a restart).
+        self._state_store: Store[dict[str, str | int]] = Store(
             hass, STORAGE_VERSION, f"{DOMAIN}_{entry.entry_id}_lock_details_poll"
         )
-        self._lock_details_store_loaded = False
+        self._state_store_loaded = False
 
         scan_minutes = max(
             entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL_MINUTES),
@@ -123,27 +132,48 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
         self._force_lock_details_refresh = True
         await self.async_request_refresh()
 
-    async def _async_load_lock_details_poll(self) -> None:
-        """Load the persisted last-refresh timestamp, once.
+    async def _async_load_persisted_state(self) -> None:
+        """Load the persisted lock-details timestamp and request count, once.
 
         Without this, a Home Assistant restart would reset the in-memory
-        timestamp and force an immediate re-fetch of the per-lock data on
-        the next cycle, defeating the point of the once-a-day interval.
+        lock-details timestamp (forcing an immediate re-fetch of the per-lock
+        data, defeating the point of the once-a-day interval) and reset the
+        request counter to 0 even though Airkey's own daily quota keeps
+        counting regardless of whether Home Assistant is running.
         """
-        if self._lock_details_store_loaded:
+        if self._state_store_loaded:
             return
-        self._lock_details_store_loaded = True
-        stored = await self._lock_details_store.async_load()
-        if stored and stored.get("last_lock_details_poll"):
+        self._state_store_loaded = True
+        stored = await self._state_store.async_load()
+        if not stored:
+            return
+        if stored.get("last_lock_details_poll"):
             try:
                 self._last_lock_details_poll = datetime.fromisoformat(
                     stored["last_lock_details_poll"]
                 )
             except ValueError:
                 _LOGGER.debug("Ignoring malformed stored lock-details timestamp")
+        if stored.get("request_count_date") and "request_count" in stored:
+            self.client.seed_request_count(
+                stored["request_count"], stored["request_count_date"]
+            )
+
+    async def _async_save_persisted_state(self) -> None:
+        await self._state_store.async_save(
+            {
+                "last_lock_details_poll": (
+                    self._last_lock_details_poll.isoformat()
+                    if self._last_lock_details_poll
+                    else None
+                ),
+                "request_count_date": self.client.request_count_date,
+                "request_count": self.client.request_count_today,
+            }
+        )
 
     async def _async_update_data(self) -> AirkeyData:
-        await self._async_load_lock_details_poll()
+        await self._async_load_persisted_state()
 
         if self._last_event_poll:
             created_after = self._last_event_poll
@@ -205,13 +235,18 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
             area_locks = await self._async_fetch_area_locks(locks)
             self._last_lock_details_poll = now
             self._force_lock_details_refresh = False
-            await self._lock_details_store.async_save(
-                {"last_lock_details_poll": now.isoformat()}
-            )
         else:
             lock_last_used = self.data.lock_last_used if self.data else {}
             medium_last_used = self.data.medium_last_used if self.data else {}
             area_locks = self.data.area_locks if self.data else {}
+
+        # Persisted every cycle (not just on lock-details refresh days) so the
+        # request counter surviving a restart stays accurate.
+        await self._async_save_persisted_state()
+
+        request_limit = self.entry.options.get(
+            CONF_DAILY_REQUEST_LIMIT, DEFAULT_DAILY_REQUEST_LIMIT
+        )
 
         return AirkeyData(
             customer=customer or {},
@@ -233,6 +268,10 @@ class AirkeyDataUpdateCoordinator(DataUpdateCoordinator[AirkeyData]):
             lock_last_used=lock_last_used,
             medium_last_used=medium_last_used,
             area_locks=area_locks,
+            lock_details_last_refreshed=self._last_lock_details_poll,
+            main_data_last_refreshed=now,
+            request_count_today=self.client.request_count_today,
+            request_count_limit=request_limit,
         )
 
     async def _async_fetch_last_used(
