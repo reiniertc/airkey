@@ -10,6 +10,7 @@ DOMAIN: Final = "airkey"
 CONF_ENVIRONMENT: Final = "environment"
 CONF_EVENT_LOOKBACK_HOURS: Final = "event_lookback_hours"
 CONF_LOCK_DETAILS_INTERVAL_HOURS: Final = "lock_details_interval_hours"
+CONF_DAILY_REQUEST_LIMIT: Final = "daily_request_limit"
 
 ENV_PRODUCTION: Final = "production"
 ENV_TEST: Final = "test"
@@ -32,6 +33,10 @@ DEFAULT_EVENT_LOOKBACK_HOURS: Final = 24
 # use the refresh_lock_details service to force an immediate update.
 DEFAULT_LOCK_DETAILS_INTERVAL_HOURS: Final = 24
 MIN_LOCK_DETAILS_INTERVAL_HOURS: Final = 1
+
+# EVVA support reported a daily request quota of 250 for a standard account;
+# this isn't documented publicly and may differ per plan, hence configurable.
+DEFAULT_DAILY_REQUEST_LIMIT: Final = 250
 
 # How far back to look, per lock, when determining "last used" (lock-protocol
 # entries are fetched per lock via a filtered query, so this bound keeps that

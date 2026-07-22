@@ -42,7 +42,8 @@
         "data": {
           "scan_interval": "Ophaalinterval (minuten)",
           "event_lookback_hours": "Terugkijkperiode voor gebeurtenissen bij eerste refresh (uren)",
-          "lock_details_interval_hours": "Ververinterval slotgebruik (uren)"
+          "lock_details_interval_hours": "Ververinterval slotgebruik (uren)",
+          "daily_request_limit": "Dagelijkse API-aanvraaglimiet"
         }
       }
     }
@@ -93,6 +94,15 @@
       },
       "lock": {
         "name": "Slot"
+      },
+      "api_requests_today": {
+        "name": "API-aanvragen vandaag"
+      },
+      "main_data_last_refreshed": {
+        "name": "Hoofdgegevens laatst ververst"
+      },
+      "lock_details_last_refreshed": {
+        "name": "Slotgegevens laatst ververst"
       }
     },
     "binary_sensor": {

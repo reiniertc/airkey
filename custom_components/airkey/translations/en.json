@@ -42,7 +42,8 @@
         "data": {
           "scan_interval": "Polling interval (minutes)",
           "event_lookback_hours": "Event lookback window on first refresh (hours)",
-          "lock_details_interval_hours": "Lock usage refresh interval (hours)"
+          "lock_details_interval_hours": "Lock usage refresh interval (hours)",
+          "daily_request_limit": "Daily API request limit"
         }
       }
     }
@@ -93,6 +94,15 @@
       },
       "lock": {
         "name": "Lock"
+      },
+      "api_requests_today": {
+        "name": "API requests today"
+      },
+      "main_data_last_refreshed": {
+        "name": "Main data last refreshed"
+      },
+      "lock_details_last_refreshed": {
+        "name": "Lock details last refreshed"
       }
     },
     "binary_sensor": {

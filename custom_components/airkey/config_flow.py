@@ -26,10 +26,12 @@ from homeassistant.helpers.selector import (
 
 from .api import AirkeyApiClient, AirkeyAuthError, AirkeyError
 from .const import (
+    CONF_DAILY_REQUEST_LIMIT,
     CONF_ENVIRONMENT,
     CONF_EVENT_LOOKBACK_HOURS,
     CONF_LOCK_DETAILS_INTERVAL_HOURS,
     CONFIG_ENTRY_VERSION,
+    DEFAULT_DAILY_REQUEST_LIMIT,
     DEFAULT_EVENT_LOOKBACK_HOURS,
     DEFAULT_LOCK_DETAILS_INTERVAL_HOURS,
     DEFAULT_SCAN_INTERVAL_MINUTES,
@@ -120,6 +122,7 @@ class AirkeyConfigFlow(ConfigFlow, domain=DOMAIN):
                         CONF_LOCK_DETAILS_INTERVAL_HOURS: (
                             DEFAULT_LOCK_DETAILS_INTERVAL_HOURS
                         ),
+                        CONF_DAILY_REQUEST_LIMIT: DEFAULT_DAILY_REQUEST_LIMIT,
                     },
                 )
 
@@ -220,6 +223,20 @@ class AirkeyOptionsFlow(OptionsFlow):
                         step=1,
                         mode=NumberSelectorMode.BOX,
                         unit_of_measurement="h",
+                    )
+                ),
+                vol.Required(
+                    CONF_DAILY_REQUEST_LIMIT,
+                    default=options.get(
+                        CONF_DAILY_REQUEST_LIMIT, DEFAULT_DAILY_REQUEST_LIMIT
+                    ),
+                ): NumberSelector(
+                    NumberSelectorConfig(
+                        min=1,
+                        max=100000,
+                        step=1,
+                        mode=NumberSelectorMode.BOX,
+                        unit_of_measurement="requests",
                     )
                 ),
             }
