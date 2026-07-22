@@ -257,6 +257,19 @@ SENSOR_DESCRIPTIONS: tuple[AirkeySensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda d: len(d.maintenance_tasks),
+        attrs_fn=lambda d: {
+            "tasks": [
+                {
+                    "lock_id": (t.get("lock") or {}).get("id"),
+                    "lock_name": _lock_names_by_id(d).get(
+                        (t.get("lock") or {}).get("id")
+                    )
+                    or (t.get("lock") or {}).get("name"),
+                    "types": t.get("maintenanceTaskList") or [],
+                }
+                for t in d.maintenance_tasks
+            ]
+        },
     ),
     AirkeySensorEntityDescription(
         key="holiday_calendars",
