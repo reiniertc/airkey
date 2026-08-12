@@ -1,0 +1,12 @@
+# Gegenereerd door XcodeGen
+*.xcodeproj
+*.xcworkspace
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Xcode
+xcuserdata/
+DerivedData/
+build/

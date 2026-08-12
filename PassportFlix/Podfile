@@ -1,0 +1,9 @@
+# CocoaPods wordt alleen gebruikt voor MobileVLCKit (binary framework).
+# Draai eerst `xcodegen generate` en daarna `pod install`,
+# open vervolgens PassportFlix.xcworkspace.
+platform :ios, '16.0'
+
+target 'PassportFlix' do
+  use_frameworks!
+  pod 'MobileVLCKit', '~> 3.6'
+end
