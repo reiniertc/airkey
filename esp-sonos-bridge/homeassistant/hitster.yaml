@@ -1,0 +1,22 @@
+# Home Assistant-scripts om de Sonos naar de ESP-stream te laten luisteren.
+# Neem dit op onder `script:` in je configuration.yaml (of via packages)
+# en pas de entity_id en het IP-adres van de ESP aan.
+
+hitster_start:
+  alias: "Hitster via Sonos starten"
+  icon: mdi:music-box-multiple
+  sequence:
+    - service: media_player.play_media
+      target:
+        entity_id: media_player.woonkamer # <- jouw Play:1
+      data:
+        media_content_id: "http://192.168.1.50/" # <- IP van de ESP
+        media_content_type: music
+
+hitster_stop:
+  alias: "Hitster via Sonos stoppen"
+  icon: mdi:music-off
+  sequence:
+    - service: media_player.media_stop
+      target:
+        entity_id: media_player.woonkamer # <- jouw Play:1
