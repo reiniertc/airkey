@@ -9,6 +9,10 @@ bijvoorbeeld om Hitster via je Sonos te spelen.
 iPhone ──Bluetooth (A2DP)──▶ ESP32 ──WiFi (HTTP WAV-stream)──▶ Sonos
 ```
 
+> **Tip:** heb je een (oude) Raspberry Pi liggen? Dan is de
+> AirPlay-route via AirConnect eenvoudiger en robuuster — zie
+> [`../rpi-bridge/`](../rpi-bridge/README.md).
+
 ## Benodigdheden
 
 - Een **klassieke ESP32** (WROOM-32 of WROVER). Let op: de ESP32-S2, S3,
