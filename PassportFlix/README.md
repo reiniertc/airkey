@@ -1,5 +1,8 @@
 # PassportFlix
 
+> Voor oude iPads/iPhones die niet verder komen dan iOS 12 is er een
+> vereenvoudigde variant: [PassportFlix Lite](../PassportFlixLite/).
+
 Een native iPhone/iPad-app (SwiftUI) die een **Netflix-achtige interface** toont voor de
 films op een **WD My Passport Wireless Pro**. De app verbindt via het wifi-netwerk van de
 WD, scant de mappen op filmbestanden en gebruikt de bijbehorende `.nfo`-bestanden

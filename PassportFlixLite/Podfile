@@ -1,0 +1,23 @@
+# Alles gaat hier via CocoaPods (geen Swift Package Manager), omdat we oudere
+# bibliotheekversies nodig hebben die nog iOS 12 ondersteunen:
+#  - AMSMB2 2.x  → laatste reeks met een deployment target lager dan iOS 13
+#    (de klasse heet daar `AMSMB2` in plaats van `SMB2Manager`)
+#  - MobileVLCKit 3.x → ondersteunt al sinds jaar en dag oude iOS-versies
+#
+# Draai eerst `xcodegen generate` en daarna `pod install`,
+# open vervolgens PassportFlixLite.xcworkspace.
+platform :ios, '12.0'
+
+target 'PassportFlixLite' do
+  use_frameworks!
+  pod 'MobileVLCKit', '~> 3.6'
+  pod 'AMSMB2', '~> 2.6'
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |t|
+    t.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+    end
+  end
+end

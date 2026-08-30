@@ -1,0 +1,23 @@
+name: PassportFlixLite
+options:
+  bundleIdPrefix: nl.tijdvoorandersom
+  deploymentTarget:
+    iOS: "12.0"
+  createIntermediateGroups: true
+
+targets:
+  PassportFlixLite:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: nl.tijdvoorandersom.passportflixlite
+        INFOPLIST_FILE: Sources/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SWIFT_VERSION: "5.0"
+        CODE_SIGN_STYLE: Automatic
+        IPHONEOS_DEPLOYMENT_TARGET: "12.0"
+        SUPPORTS_MACCATALYST: NO
